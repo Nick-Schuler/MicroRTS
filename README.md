@@ -288,7 +288,7 @@ It's in lines 4 and 5 in [`RunLoop.sh`](RunLoop.sh)
 ## IntelliJ IDEA
 Option A: Use the built-in Terminal and run the same commands as above. (one way to do)
 Option B: Run → Edit Configurations → “+” → Shell Script
-Script: <project>/[`RunLoop.sh`](RunLoop.sh)
+Script: <project> ./[`RunLoop.sh`](RunLoop.sh)
 Working directory: project root
 Env vars (optional): TOTAL_RUNS=1000; RUN_TIME_PER_GAME_SEC=60
 Apply → Run
