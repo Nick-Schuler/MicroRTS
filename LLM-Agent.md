@@ -20,7 +20,7 @@
  
 * to change model name: [ollama.java](https://github.com/drchangliu/MicroRTS/tree/master/src/ai/abstraction/ollama.java)    in line 121  static String MODEL = System.getenv().getOrDefault("OLLAMA_MODEL", "llama3.1:8b");
 This  "llama3.1:8b" is the modal. If you want to change to a different model, same install the model and paste the model name here. 
-* to change the opponent, edit  [config.properties](https://github.com/drchangliu/MicroRTS/resources/config.properties) `AI2=ai.PassiveAI`  AI2 is the other player.
+* to change the opponent, edit  [config.properties](resources/config.properties) `AI2=ai.PassiveAI`  AI2 is the other player.
 Read the comments; they are self-explanatory.
 ```
 # ai.RandomBiasedAI
