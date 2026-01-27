@@ -18,7 +18,7 @@
 * On the same computer, run the benchmark to get numbers for your own favourite Ollama model
 * Try to improve your game AI performance by improving the prompts
  
-* to change model name: [ollama.java](https://github.com/drchangliu/MicroRTS/src/ai/abstraction/ollama.java)    in line 121  static String MODEL = System.getenv().getOrDefault("OLLAMA_MODEL", "llama3.1:8b");
+* to change model name: [ollama.java](https://github.com/drchangliu/MicroRTS/tree/master/src/ai/abstraction/ollama.java)    in line 121  static String MODEL = System.getenv().getOrDefault("OLLAMA_MODEL", "llama3.1:8b");
 This  "llama3.1:8b" is the modal. If you want to change to a different model, same install the model and paste the model name here. 
 * to change the opponent, edit  [config.properties](https://github.com/drchangliu/MicroRTS/resources/config.properties) `AI2=ai.PassiveAI`  AI2 is the other player.
 Read the comments; they are self-explanatory.
@@ -31,7 +31,7 @@ Read the comments; they are self-explanatory.
 # ai.abstraction.ollama
 ```
 
-* to change prompt: edit the PROMPT string in the [ollama.java](https://github.com/drchangliu/MicroRTS/src/ai/abstraction/ollama.java) 
+* to change prompt: edit the PROMPT string in the [ollama.java](https://github.com/drchangliu/MicroRTS/tree/master/src/ai/abstraction/ollama.java) 
 * to change map: in line 25 in  [config.properties](https://github.com/drchangliu/MicroRTS/resources/config.properties) " map_location=maps/8x8/basesWorkers8x8.xml "
 Now, to change the map, go to the maps folder in the project and paste the proper .xml file.
 * to change the number of games available in [Runloop.sh](https://github.com/drchangliu/MicroRTS/RunLoop.sh)
