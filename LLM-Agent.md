@@ -32,9 +32,9 @@ Read the comments; they are self-explanatory.
 ```
 
 * to change prompt: edit the PROMPT string in the [ollama.java](https://github.com/drchangliu/MicroRTS/tree/master/src/ai/abstraction/ollama.java) 
-* to change map: in line 25 in  [config.properties](https://github.com/drchangliu/MicroRTS/resources/config.properties) " map_location=maps/8x8/basesWorkers8x8.xml "
+* to change map: in line 25 in  [config.properties](resources/config.properties) " map_location=maps/8x8/basesWorkers8x8.xml "
 Now, to change the map, go to the maps folder in the project and paste the proper .xml file.
-* to change the number of games available in [Runloop.sh](https://github.com/drchangliu/MicroRTS/RunLoop.sh)
+* to change the number of games available in [Runloop.sh](RunLoop.sh)
 ```
 TOTAL_RUNS=5                         # << set to 1000 for one thousand runs
 RUN_TIME_PER_GAME_SEC="${RUN_TIME_PER_GAME_SEC:-350}"  # << set default seconds per run, it needs to be 500
