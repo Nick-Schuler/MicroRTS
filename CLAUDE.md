@@ -63,3 +63,44 @@ map=default
 game=1
 winner=LLM
 ticks=4321
+
+---
+
+## Benchmark Results (2026-02-01)
+
+**Status:** All games timed out - GPU required for playable inference speed
+
+| Model | Game | Winner | Ticks | Status |
+|-------|------|--------|-------|--------|
+| llama3.1:8b | 1 | unknown | unknown | timeout |
+| llama3.1:8b | 2 | unknown | unknown | timeout |
+| qwen3:14b | 1 | unknown | unknown | timeout |
+| qwen3:14b | 2 | unknown | unknown | timeout |
+
+**Configuration:**
+- Map: maps/8x8/basesWorkers8x8.xml
+- Max Cycles: 5000
+- Timeout per game: 300 seconds
+- Ollama running on CPU
+
+**Finding:** CPU-only inference is too slow for real-time gameplay. All games timed out because the LLM couldn't generate responses fast enough. Games hung at the first `[ollama.getAction]` call.
+
+**Recommendation:** Run benchmarks on a GPU node with:
+```bash
+srun --gres=gpu:1 --pty bash
+ollama serve &
+./benchmark.sh
+```
+
+---
+
+## Files Overview
+
+| File | Purpose |
+|------|---------|
+| `benchmark.sh` | Main benchmark script |
+| `benchmark_gpu.sh` | GPU-aware benchmark with SLURM |
+| `benchmark_results_*.txt` | Output results |
+| `logs/` | Game logs per run |
+| `GPU_SETUP.md` | GPU setup instructions |
+| `PROJECT_STRUCTURE.md` | Codebase structure reference |
