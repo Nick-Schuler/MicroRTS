@@ -2,316 +2,218 @@
     <img src="microrts-text.png" width="500px"/>
 </p>
 
-[![Build Status](https://travis-ci.org/douglasrizzo/microrts.svg?branch=master)](https://travis-ci.org/douglasrizzo/microrts)
+# MicroRTS with LLM Game AI Agents
 
-microRTS is a small implementation of an RTS game, designed to perform AI research. The advantage of using microRTS with respect to using a full-fledged game like Wargus or StarCraft (using BWAPI) is that microRTS is much simpler, and can be used to quickly test theoretical ideas, before moving on to full-fledged RTS games.
+This repository serves **three purposes**:
 
-By default, microRTS is deterministic and real-time (i.e. players can issue actions simultaneously, and actions are durative). However, it is possible to experiment both with fully-observable and partially-observable games, as well as with deterministic and non-deterministic settings via configuration flags. As part of the implementation, I include a collection of hard-coded, and game-tree search techniques (such as variants of minimax, Monte Carlo search, and Monte Carlo Tree Search).
-
-microRTS was developed by [Santiago Ontañón](https://sites.google.com/site/santiagoontanonvillar/Home). 
-
-MicroRTS-Py will eventually be updated, maintained, and made compliant with the standards of the Farama Foundation (https://farama.org/project_standards). However, this is currently a lower priority than other projects we're working to maintain. If you'd like to contribute to development, you can join our discord server here- https://discord.gg/jfERDCSw.
-
-For a video of how microRTS looks like when a human plays, see a [YouTube video](https://www.youtube.com/watch?v=ZsKKAoiD7B0)
-
-If you are interested in testing your algorithms against other people's, **there is an annual microRTS competition**. For more information on the competition see the [competition website](https://sites.google.com/site/micrortsaicompetition/home). The previous competitions have been organized at IEEE-CIG2017 and IEEE-CIG2018, and this year it's organized at IEEE-COG2019 (notice the change of name of the conference).
-
-To cite microRTS, please cite this paper:
-
-Santiago Ontañón (2013) The Combinatorial Multi-Armed Bandit Problem and its Application to Real-Time Strategy Games, In AIIDE 2013. pp. 58 - 64.
-
-## Setting up microRTS in an IDE
-
-Watch [this YouTube video](https://www.youtube.com/watch?v=_jVOMNqw3Qs) to learn how to acquire microRTS and setup a project using Netbeans.
-
-## Reinforcement Learning in microRTS
-
-If you'd like to use reinforcement learning in microRTS please check this project: https://github.com/Farama-Foundation/MicroRTS-Py
-
-## Executing microRTS through the terminal
-
-If you want to build and run microRTS from source using the command line, clone or download this repository and run the following commands in the root folder of the project to compile the source code:
-
-Linux or Mac OS:
-
-```shell
-javac -cp "lib/*:src" -d bin src/rts/MicroRTS.java # to build
-```
-
-Windows:
-
-```shell
-javac -cp "lib/*;src" -d bin src/rts/MicroRTS.java # to build
-```
-
-### Generating a JAR file
-
-You can join all compiled source files and dependencies into a single JAR file, which can be executed on its own. In order to create a JAR file for microRTS:
-
-```shell
-javac -cp "lib/*:src" -d bin $(find . -name "*.java") # compile source files
-cd bin
-find ../lib -name "*.jar" | xargs -n 1 jar xvf # extract the contents of the JAR dependencies
-jar cvf microrts.jar $(find . -name '*.class' -type f) # create a single JAR file with sources and dependencies
-```
-
-### Executing microRTS
-
-To execute microRTS from compiled class files:
-
-```shell
-java -cp "lib/*:bin" rts.MicroRTS # on Linux/Mac
-java -cp "lib/*;bin" rts.MicroRTS # on Windows
-```
-
-To execute microRTS from the JAR file:
-
-```shell
-java -cp microrts.jar rts.MicroRTS
-```
-
-#### Which class to execute
-
-microRTS has multiple entry points, and for experimentation purposes you might eventually want to create your own class if none of the base ones suit your needs (see the "tests" folder for examples), but a default one is the `gui.frontend.FrontEnd` class, which opens the default GUI. To execute microRTS in this way, use the following command:
-
-```shell
-java -cp microrts.jar gui.frontend.FrontEnd
-```
-
-Another, more expansive entry point is the `rts.MicroRTS` class. It is capable of starting microRTS in multiple modes, such as in client mode (attempts to connect to a server which will provide commands to a bot), server mode (tries to connect to a client in order to control a bot), run a standalone game and exit or open the default GUI.
-
-The `rts.MicroRTS` class accepts multiple initialization parameters, either from the command line or from a properties file. A list of all the acceptable command-line arguments can be accessed through the following command:
-
-```shell
-java -cp microrts.jar rts.MicroRTS -h
-```
-
-An example of a properties file is provided in the `resources` directory. microRTS can be started using a properties file with the following command:
-
-```shell
-java -cp microrts.jar rts.MicroRTS -f my_file.properties
-```
-
-## Instructions
-
-![instructions image](https://raw.githubusercontent.com/santiontanon/microrts/master/help.png)
-# MicroRTS-LLM-G
-
-### Running LLM_Gemini
-
-Provide your Gemini API_KEY and the details required to establish the API connection, such as the model name (e.g., "gemini-2.5-flash" or "gemini-2.0-flash") in [`src/ai/abstraction/LLM_Gemini.java`](src/ai/abstraction/LLM_Gemini.java)
-
-Once configured, run the project from:
-
-[`src/gui/frontend/FrontEnd.java`](src/gui/frontend/FrontEnd.java)
-
-Running Other AI Models
-
-
-You can either:
-
-Modify directly: Edit the contents of the existing [`LLM_Gemini.java`](src/ai/abstraction/LLM_Gemini.java) file.
-
-Duplicate and modify: Create a copy of [`LLM_Gemini.java`](src/ai/abstraction/LLM_Gemini.java) and adapt it for the new model.
-
-In both cases, make sure to provide your API_KEY and specify the model name (e.g., "gemini-2.5-flash", "gemini-2.0-flash", etc.).
-
-
-
-### Running Batch Files
-
-To run experiments with [`run_loop.slurm`](run_loop.slurm), follow these steps:
+1. **MicroRTS Game Engine** - A complete fork of the original [MicroRTS](https://github.com/santiontanon/microrts) real-time strategy game, designed for AI research
+2. **LLM Game AI Competition Platform** - A template and framework for the [2026 IEEE WCCI MicroRTS LLM Game AI Competition](https://attend.ieee.org/wcci-2026/competitions/)
+3. **LLM Benchmark Suite** - Tools to measure and compare how well different LLMs perform as game-playing agents
 
 ---
 
-#### 1. Submit the Batch Job
-Run:
+## Quick Navigation
+
+| Purpose | Documentation |
+|---------|---------------|
+| Run the competition | [COMPETITION.md](COMPETITION.md) |
+| Benchmark LLMs | [BENCHMARKING.md](BENCHMARKING.md) |
+| Original MicroRTS | [MICRORTS_ORIGINAL.md](MICRORTS_ORIGINAL.md) |
+| Technical prompt format | [LLM_PROMPTS.md](LLM_PROMPTS.md) |
+| Codebase structure | [PROJECT_STRUCTURE.md](PROJECT_STRUCTURE.md) |
+
+---
+
+## 1. MicroRTS Game Engine
+
+MicroRTS is a lightweight RTS game designed for AI research by [Santiago Ontanon](https://sites.google.com/site/santiagoontanonvillar/Home). It provides:
+
+- Deterministic, real-time gameplay with simultaneous actions
+- Configurable partial observability and non-determinism
+- Multiple built-in AI implementations (minimax, MCTS, rule-based strategies)
+- Tournament framework for AI competitions
+
+**Why MicroRTS for LLM research?**
+- Simpler than StarCraft/Warcraft, enabling faster experimentation
+- Well-defined action space and game state representation
+- Established research community and competition history
+
+For full original documentation, see [MICRORTS_ORIGINAL.md](MICRORTS_ORIGINAL.md).
+
+---
+
+## 2. LLM Game AI Competition
+
+This repository is the official platform for the **2026 IEEE WCCI MicroRTS LLM Game AI Competition**.
+
+**Competition Goal:** Build an LLM-powered agent that can play MicroRTS competitively by:
+- Understanding game state descriptions
+- Generating valid action commands
+- Developing winning strategies through prompts
+
+### Quick Start for Competitors
 
 ```bash
-sbatch run_loop.slurm
+# 1. Clone the repository
+git clone https://github.com/drchangliu/MicroRTS
+cd MicroRTS
+
+# 2. Install Ollama and download a model
+ollama run llama3.1:8b   # Leave running in terminal
+
+# 3. Compile and run
+chmod +x RunLoop.sh
+./RunLoop.sh
 ```
 
-You will see a message like:
+**Key files for competition:**
+- `src/ai/abstraction/ollama.java` - Main LLM agent (modify the PROMPT here)
+- `resources/config.properties` - Game configuration
+- `RunLoop.sh` - Run multiple games automatically
+
+See [COMPETITION.md](COMPETITION.md) for complete competition rules and setup instructions.
+
+---
+
+## 3. LLM Benchmark Suite
+
+Use this repository to measure how well different LLMs perform as game-playing agents.
+
+### Supported LLM Backends
+
+| Backend | Implementation | Status |
+|---------|---------------|--------|
+| Ollama (local) | `ollama.java` | Recommended |
+| Google Gemini | `LLM_Gemini.java` | Working |
+| Mistral | `mistral.java` | Working |
+| Deepseek R1 | `LLM_DeepseekR1.java` | Working |
+
+### Running Benchmarks
+
+```bash
+# Start Ollama (on GPU for reasonable speed)
+srun --gres=gpu:1 --pty bash  # If on HPC cluster
+ollama serve &
+
+# Run benchmark suite
+./benchmark.sh
+```
+
+### Benchmark Metrics
+
+Each game records:
+- **Winner** - Which AI won (LLM or opponent)
+- **Game length** - Number of ticks to completion
+- **Model name** - Which LLM was tested
+- **Crashes/errors** - Any invalid actions or failures
+
+See [BENCHMARKING.md](BENCHMARKING.md) for detailed benchmarking instructions.
+
+---
+
+## Repository Structure
 
 ```
-Submitted batch job <job_number>
+MicroRTS/
+├── src/                          # Java source code
+│   ├── ai/                       # AI implementations
+│   │   ├── abstraction/
+│   │   │   ├── ollama.java       # Ollama LLM agent
+│   │   │   ├── LLM_Gemini.java   # Gemini API agent
+│   │   │   └── ...               # Other LLM backends
+│   │   ├── RandomBiasedAI.java   # Baseline opponent
+│   │   └── mcts/, minimax/       # Traditional game AI
+│   ├── rts/                      # Game engine core
+│   └── gui/                      # GUI components
+├── maps/                         # Game maps (8x8 to 24x24)
+├── resources/config.properties   # Game configuration
+├── benchmark.sh                  # Benchmark runner
+├── RunLoop.sh                    # Multi-game runner
+└── lib/                          # Dependencies
 ```
 
 ---
 
-#### 2. Monitor Output Files
-Check how many files are being generated by listing your date-stamped results folders:
+## Building and Running
+
+### Prerequisites
+
+- JDK 17+ (`javac -version`, `java -version`)
+- Ollama (for local LLM inference)
+- GPU recommended for real-time gameplay
+
+### Compile
 
 ```bash
-ls -lrt 2025-MM-dd_*
+# Using the build script
+find src -name '*.java' > sources.list
+javac -cp "lib/*:bin" -d bin @sources.list
+
+# Or using Ant
+ant build
 ```
 
-- Replace `MM` with the month (e.g., `09`)  
-- Replace `dd` with the day (e.g., `26`)
-
----
-
-#### 3. Check Log Files
-List the SLURM logs:
+### Run
 
 ```bash
-ls -lrt slurm-*.out
-```
+# GUI mode
+java -cp "lib/*:bin" gui.frontend.FrontEnd
 
-You will see files such as:
+# Headless mode with config
+java -cp "lib/*:bin" rts.MicroRTS -f resources/config.properties
 
-```
-slurm-16775.out
-```
-
-Open the most recent log to inspect errors or progress:
-
-```bash
-vi slurm-16775.out
-```
-
----
-
-#### 4. Verify CSV Outputs
-If no errors are found, check how many CSV files were generated:
-
-```bash
-ls -lrt 2025-MM-dd_*
+# Tournament mode
+java -cp "lib/*:bin" gui.frontend.FrontEnd  # Use Tournaments tab
 ```
 
 ---
 
-#### 5. Cancel Running Jobs
-If you need to stop your jobs, first see your active jobs:
+## Configuration
 
-```bash
-squeue -u $USER
+Edit `resources/config.properties`:
+
+```properties
+# Game settings
+map_location=maps/8x8/basesWorkers8x8.xml
+max_cycles=5000
+headless=true
+
+# AI players
+AI1=ai.abstraction.ollama        # Your LLM agent
+AI2=ai.RandomBiasedAI            # Opponent
+
+# Available opponents:
+# ai.RandomBiasedAI, ai.RandomAI, ai.PassiveAI
+# ai.abstraction.HeavyRush, ai.abstraction.LightRush
 ```
 
-Find your `JOBID` (e.g., `18437`) and cancel it:
+---
 
-```bash
-scancel 18437
-```
+## Citation
 
-Example: if your username is `mg546924` and the job ID is `18437`, then:
+If you use MicroRTS in your research, please cite:
 
-```bash
-scancel 18437
-``` 
+> Santiago Ontanon (2013) *The Combinatorial Multi-Armed Bandit Problem and its Application to Real-Time Strategy Games*, AIIDE 2013. pp. 58-64.
 
-> **Note:**  
-> If you encounter an error like:  
-> ```
-> You exceeded your current quota. Please check your plan and billing details
-> ```  
-> it is recommended to stop the job and wait **3–4 hours** (up to **1 day**, depending on your plan).  
-> Alternatively, you may need to **upgrade your plan** to avoid this issue.
+For LLM agent work using this repository, please also cite this repository.
 
-## prompt
-To modify the LLM prompt for Gemini, Ollama, etc, we can go to their main script [`LLM_Gemini.java`](src/ai/abstraction/LLM_Gemini.java). We can see a string named ' prompt and modify it based on your idea to win. Same with other LLM models in the project. 
-##
+---
 
+## Related Resources
 
-#
+- [Original MicroRTS](https://github.com/santiontanon/microrts) - Upstream repository
+- [MicroRTS-Py](https://github.com/Farama-Foundation/MicroRTS-Py) - Python/RL interface
+- [microRTS Competition](https://sites.google.com/site/micrortsaicompetition/home) - Annual AI competition
+- [2026 IEEE WCCI](https://attend.ieee.org/wcci-2026/competitions/) - LLM competition venue
 
-## Running Multiple Games at the Same Time:
+---
 
-<img width="935" height="798" alt="Screenshot 2025-10-28 at 9 10 19 AM" src="https://github.com/user-attachments/assets/4ef13d14-9d92-4f6d-8260-39182e40432c" />
+## Contributing
 
-0. Switch to the "Tournaments" tab on the top of the window.
+See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines on submitting pull requests.
 
-1. **Opponent Mode**
-   - Set the Opponent dropdown **Round Robin** to **Fixed Opponents**.
+---
 
-2. **Select AIs**
-   - From **Available AIs**:
-     - Add your AI to **Selected AIs**.
-     - Add the baselines/opponents to **Opponent AIs**.
+## License
 
-3. **Maps**
-   - Go to **Maps** → click **+** → browse to the project’s `maps` folder.
-   - Add a map (e.g. `8x8` or `24x24`).
-
-4. **Iterations**
-   - Set **Iterations** = number of games per matchup  
-     (e.g. `2` → 2 games, `3` → 3 games).
-
-5. **Match Config**
-   - **Max Game Length** = `3000`
-   - **Time Budget** = `1000`
-   - Leave the other timing fields as default.
-
-6. **Unit Type Table / Rules**
-   - Set **Unit Type Table** = `Original - Both`
-   - do not Check:
-     - `Self-play matches`
-     - `Game over if AI times out`
-     - (Keep the other default checkboxes enabled.)
-
-7. **Run Tournament**
-
-<img width="814" height="480" alt="Screenshot 2025-10-28 at 9 17 04 AM" src="https://github.com/user-attachments/assets/ac1a69f1-eff9-4a01-a9da-7374895badde" />
-
-We can see their response in here, as well as the "tournament_nn" folder created in their project folder 
-
-#
-# Running multiple games automatically
-
-
-Run the game multiple times automatically with  [`RunLoop.sh`](RunLoop.sh).
-The script recompiles, launches a match, waits N seconds, kills it, and repeats.
-
-Prerequisites
-JDK 17+ on your PATH (javac -version, java -version).
-Project layout includes src/, lib/ (jars), and bin/ (compiled out).
-Run from the project root.
-
-### first time only—make it executable
-chmod +x [`RunLoop.sh`](RunLoop.sh)
-
-### run with defaults (e.g., 5 runs × 10s each) .[`RunLoop.sh`](RunLoop.sh)
-
-Customize the loop
-
-TOTAL_RUNS — how many matches to run
-
-RUN_TIME_PER_GAME_SEC — seconds to let each match play before auto-kill
-
-
-It's in lines 4 and 5 in [`RunLoop.sh`](RunLoop.sh)
-
-- TOTAL_RUNS=10                         # << set to 1000 for one thousand runs
-
-- RUN_TIME_PER_GAME_SEC="${RUN_TIME_PER_GAME_SEC:-400}"  # << set default seconds per run, it needs to be 500
- 
-## IntelliJ IDEA
-Option A: Use the built-in Terminal and run the same commands as above. (one way to do)
-Option B: Run → Edit Configurations → “+” → Shell Script
-Script: <project> ./[`RunLoop.sh`](RunLoop.sh)
-Working directory: project root
-Env vars (optional): TOTAL_RUNS=1000; RUN_TIME_PER_GAME_SEC=60
-Apply → Run
-Option C: get the latest repo from GitHub and go to the script [`RunLoop.sh`](RunLoop.sh).
-
-# to know who is the winner 
-After the game ends, we can open the ResponseTimestamp(YYYY_MM_DD*).csv file and go to the "Score_in_every_run" column. If AI1 is Player zero P0 and AI2 is Player one P1, and p0 > p1, then Player zero is the winner; otherwise, Player one is the winner. We can modify the player in [`config.properties`](resources/config.properties)
-
-## To Stop early
-Press Ctrl+C in the terminal; the script cleans up the running game and exits.
-
-
-#
-# To modify the players in the multiple games automatically
-
-In   [`config.properties`](resources/config.properties) , you can see AI1 and AI2, and modify them.
-
-
-
-# to add Ollama model type this in the terminal 
-
-```
-- ollama run llama3.1:8b
-```
-
-
+MicroRTS is open source. See the original repository for license details.

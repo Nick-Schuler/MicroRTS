@@ -1,13 +1,18 @@
-# MicroRTS Project - Comprehensive Code Exploration Report
+# MicroRTS Project Structure
 
 **Last Updated:** 2026-02-01
-**Purpose:** Reference document for AI coding assistants to understand the codebase without re-exploration.
+**Purpose:** Technical reference for navigating the codebase.
 
 ---
 
 ## 1. PROJECT OVERVIEW
 
-**MicroRTS** is a lightweight Real-Time Strategy (RTS) game engine designed for AI research. It simulates a simplified RTS environment where two players compete to eliminate all opposing units and buildings. The project has been extended to support LLM-driven agents using local Ollama models.
+This repository serves **three purposes**:
+1. **MicroRTS Game Engine** - Complete fork of original MicroRTS for AI research
+2. **LLM Competition Platform** - Template for 2026 IEEE WCCI MicroRTS LLM Game AI Competition
+3. **LLM Benchmark Suite** - Tools to measure LLM game-playing performance
+
+**Core Technology:** Java-based RTS game engine with LLM agent integrations via Ollama, Gemini, and other APIs.
 
 **Repository Location:** `/home/liuc/gitwork/MicroRTS`
 **Total Java Source Files:** 361
@@ -67,8 +72,19 @@ MicroRTS/
 │   └── config.properties         # Game configuration file
 ├── logs/                         # Game execution logs
 ├── build.xml                     # Ant build configuration
-├── CLAUDE.md                     # LLM benchmark instructions
-├── LLM-Agent.md                  # LLM agent setup guide
+│
+├── # Documentation
+├── README.md                     # Main entry point (3 purposes)
+├── COMPETITION.md                # IEEE WCCI 2026 competition guide
+├── BENCHMARKING.md               # LLM benchmarking instructions
+├── MICRORTS_ORIGINAL.md          # Original MicroRTS documentation
+├── LLM_PROMPTS.md                # LLM prompt format specification
+├── PROJECT_STRUCTURE.md          # This file - codebase reference
+├── GPU_SETUP.md                  # HPC/GPU setup instructions
+├── CLAUDE.md                     # AI coding assistant instructions
+├── CONTRIBUTING.md               # Contribution guidelines
+│
+├── # Scripts
 ├── benchmark.sh                  # Automated benchmark script
 └── RunLoop.sh                    # Game execution loop script
 ```
