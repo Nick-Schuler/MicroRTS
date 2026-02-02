@@ -76,6 +76,37 @@ Feature locations:
 (5,6) Enemy Base Unit {resources=5, current_action=idle, HP=1}
 ```
 
+## Critical JSON Format Requirements
+
+Based on testing, LLMs commonly make these errors that cause move rejection:
+
+1. **Missing `unit_position` field** - Each move MUST include `unit_position: [x, y]`
+2. **Commanding enemy units** - LLMs often try to issue commands to Enemy units
+3. **Moves as strings instead of objects** - Each move must be a JSON object, not a string
+4. **Invalid action format** - Action arguments must use exact format: `((x, y))` not `(x, y)`
+
+### Valid Move Example
+```json
+{
+  "raw_move": "(1, 1): worker harvest((0, 0), (2, 1))",
+  "unit_position": [1, 1],
+  "unit_type": "worker",
+  "action_type": "harvest"
+}
+```
+
+### Common Invalid Moves (will be rejected)
+```json
+// BAD: Missing unit_position
+{"raw_move": "(1, 1): worker harvest((0, 0), (2, 1))"}
+
+// BAD: Move is a string, not object
+"(1, 1): worker harvest((0, 0), (2, 1))"
+
+// BAD: Trying to command enemy unit (position belongs to Enemy)
+{"raw_move": "(5, 6): base train(worker)", "unit_position": [5, 6], ...}
+```
+
 ## Response Schema
 The JSON response structure the LLM fills out.
 ```json
