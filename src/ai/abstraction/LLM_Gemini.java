@@ -38,8 +38,8 @@ public class LLM_Gemini extends AbstractionLayerAI {
      * connected to 2 classes  unitTypeTable & unitType
      */
 
-    // NOTE: TESTING ONLY gmu3r2g need to remove it are better ways to handile it in github
-    static final String API_KEY =  "";// "AIzaSyAO-cFtXYe1QZiNk7z1VOlB5Kj2TURXV4o"; /// remove it
+    // Read API key from environment variable GEMINI_API_KEY
+    static final String API_KEY = System.getenv().getOrDefault("GEMINI_API_KEY", "");
 
 
     // gemini-1.5-flash (15 req/min)
@@ -52,7 +52,7 @@ public class LLM_Gemini extends AbstractionLayerAI {
     // How often the LLM should act on the game state
     // More frequent LLM intervention is not necessarily better
     // Low = more frequent, higher = less freqeunt
-    static final Integer LLM_INTERVAL = 1;  // ? why can't i have less than that
+    static final Integer LLM_INTERVAL = 100;  // Reduced from 1 to avoid API rate limits
     LocalDateTime now = LocalDateTime.now();
     String timestamp = now.format(DateTimeFormatter.ofPattern("yyyy-MM-dd_HH-mm-ss"));
 
