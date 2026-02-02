@@ -1717,7 +1717,8 @@ public class ollama extends AbstractionLayerAI {
             // Build Ollama request body
             JsonObject body = new JsonObject();
             body.addProperty("model", MODEL);
-            body.addProperty("prompt", finalPrompt);
+            // Prepend /no_think to disable qwen3 thinking mode for faster responses
+            body.addProperty("prompt", "/no_think " + finalPrompt);
             body.addProperty("stream", OLLAMA_STREAM);   // false -> single JSON
             body.addProperty("format", OLLAMA_FORMAT);   // "json" -> enforce JSON output
 
@@ -1759,14 +1760,24 @@ public class ollama extends AbstractionLayerAI {
 
             // Ollama /api/generate returns JSON like:
             // {"model":"...","created_at":"...","response":"...TEXT...","done":true,...}
+            // Note: qwen3 "thinking" models put output in "thinking" field instead of "response"
             JsonObject top = JsonParser.parseString(sb.toString()).getAsJsonObject();
 
-            if (!top.has("response")) {
-                System.err.println("❌ Unexpected Ollama payload: " + sb);
+            String modelText = "";
+
+            // First try "response" field (standard models like llama3.1)
+            if (top.has("response") && !top.get("response").getAsString().isEmpty()) {
+                modelText = top.get("response").getAsString();
+            }
+            // Fall back to "thinking" field (qwen3 thinking models)
+            else if (top.has("thinking") && !top.get("thinking").isJsonNull()) {
+                modelText = top.get("thinking").getAsString();
+                System.out.println("📝 Using 'thinking' field from qwen3 model");
+            }
+            else {
+                System.err.println("❌ Unexpected Ollama payload (no response or thinking): " + sb);
                 return "{\"thinking\":\"invalid_response\",\"moves\":[]}";
             }
-
-            String modelText = top.get("response").getAsString();
 
             // (Optional) log the raw text for debugging
             // System.out.println("OLLAMA raw response:\n" + modelText);
