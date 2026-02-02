@@ -50,9 +50,9 @@ public class LLM_Gemini extends AbstractionLayerAI {
     static final String ENDPOINT_URL = "https://generativelanguage.googleapis.com/v1beta/models/";
     static final JsonObject MOVE_RESPONSE_SCHEMA;
     // How often the LLM should act on the game state
-    // More frequent LLM intervention is not necessarily better
-    // Low = more frequent, higher = less freqeunt
-    static final Integer LLM_INTERVAL = 100;  // Reduced from 1 to avoid API rate limits
+    // NOTE: Fairness is now handled at the game level via ai_decision_interval in config.properties
+    // This should be set to 1 so the LLM responds whenever the game asks
+    static final Integer LLM_INTERVAL = 1;
     LocalDateTime now = LocalDateTime.now();
     String timestamp = now.format(DateTimeFormatter.ofPattern("yyyy-MM-dd_HH-mm-ss"));
 

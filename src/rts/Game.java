@@ -81,7 +81,6 @@ public class Game {
         System.out.println(" headless --> "+headless);
         System.out.println(" updateInterval --> "+updateInterval);
         System.out.println(" partiallyObservable --> "+partiallyObservable);
-        System.out.println(" updateInterval --> "+updateInterval);
 
 
 
@@ -117,7 +116,6 @@ public class Game {
         System.out.println(" player_two --> "+player_two);
         System.out.println("  partiallyObservable --> "+partiallyObservable);
         System.out.println(" headless --> "+headless);
-        System.out.println(" maxCycles --> "+maxCycles);
         System.out.println(" maxCycles --> "+maxCycles);
 
     }
@@ -158,6 +156,8 @@ public class Game {
             rts.GameState playerTwoGameState =
                     partiallyObservable ? new PartiallyObservableGameState(gs, 1) : gs;
 
+            // Game waits for both AIs to respond - this is naturally fair
+            // If an AI takes 5 seconds, the game just runs slower, not unfairly
             rts.PlayerAction pa1 = ai1.getAction(0, playerOneGameState);
             rts.PlayerAction pa2 = ai2.getAction(1, playerTwoGameState);
             gs.issueSafe(pa1);
