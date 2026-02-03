@@ -6,3 +6,11 @@ microrts.jar
 /.project
 /.idea
 /.vscode
+
+# Experiment logs and temporary files
+Response*.csv
+LLM_Gemini_*.json
+tournament_results_*.json
+benchmark_results_*.txt
+sources.list
+/logs/
