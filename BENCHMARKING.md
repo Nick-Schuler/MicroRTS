@@ -213,6 +213,63 @@ See [GPU_SETUP.md](GPU_SETUP.md) for detailed HPC instructions.
 
 ---
 
+## LLM vs LLM Games
+
+You can run two LLMs against each other to compare their strategic capabilities.
+
+### Using Different Ollama Models
+
+```bash
+# Set different models for each player
+export OLLAMA_MODEL="llama3.1:8b"      # Player 0
+export OLLAMA_MODEL_P2="qwen3:4b"      # Player 1
+
+# Update config.properties
+# AI1=ai.abstraction.ollama
+# AI2=ai.abstraction.ollama2
+```
+
+### Using Ollama vs Gemini
+
+```bash
+# Set Ollama model for Player 0
+export OLLAMA_MODEL="llama3.1:8b"
+
+# Set Gemini API key for Player 1
+export GEMINI_API_KEY="your-api-key"
+
+# Update config.properties
+# AI1=ai.abstraction.ollama
+# AI2=ai.abstraction.LLM_Gemini
+```
+
+### Available LLM AI Classes
+
+| Class | Environment Variables | Description |
+|-------|----------------------|-------------|
+| `ai.abstraction.ollama` | `OLLAMA_MODEL`, `OLLAMA_HOST` | Primary Ollama agent |
+| `ai.abstraction.ollama2` | `OLLAMA_MODEL_P2`, `OLLAMA_HOST` | Second Ollama agent (different model) |
+| `ai.abstraction.LLM_Gemini` | `GEMINI_API_KEY` | Google Gemini API |
+
+### Example: LLM Tournament
+
+```bash
+#!/bin/bash
+models=("llama3.1:8b" "qwen3:4b" "mistral:7b")
+for m1 in "${models[@]}"; do
+    for m2 in "${models[@]}"; do
+        if [ "$m1" != "$m2" ]; then
+            export OLLAMA_MODEL="$m1"
+            export OLLAMA_MODEL_P2="$m2"
+            echo "Running: $m1 vs $m2"
+            java -cp "lib/*:bin" rts.MicroRTS -f resources/config.properties
+        fi
+    done
+done
+```
+
+---
+
 ## Adding New LLM Backends
 
 To benchmark a new LLM provider:
