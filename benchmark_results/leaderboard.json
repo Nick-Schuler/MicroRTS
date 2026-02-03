@@ -1,0 +1,25 @@
+{
+  "entries": [
+    {
+      "model": "llama3.1:8b",
+      "score": 0.0,
+      "date": "2026-02-03T05:48:36.310779",
+      "map": "maps/8x8/basesWorkers8x8.xml",
+      "games_per_matchup": 1
+    },
+    {
+      "model": "qwen3:4b",
+      "score": 0.0,
+      "date": "2026-02-03T05:48:36.310786",
+      "map": "maps/8x8/basesWorkers8x8.xml",
+      "games_per_matchup": 1
+    },
+    {
+      "model": "gemini-2.5-flash",
+      "score": 50.0,
+      "date": "2026-02-03T05:48:36.310788",
+      "map": "maps/8x8/basesWorkers8x8.xml",
+      "games_per_matchup": 1
+    }
+  ]
+}

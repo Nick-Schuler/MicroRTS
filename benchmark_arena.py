@@ -30,9 +30,9 @@ from pathlib import Path
 # Configuration
 CONFIG_FILE = "resources/config.properties"
 RESULTS_DIR = "benchmark_results"
-MAX_CYCLES = 3000  # Reduced for faster games
+MAX_CYCLES = 1500  # Further reduced for quick benchmarks
 MAP = "maps/8x8/basesWorkers8x8.xml"
-GAME_TIMEOUT = 900  # 15 minutes per game
+GAME_TIMEOUT = 600  # 10 minutes per game
 
 # Reference AI anchors with scoring weights
 # These are FIXED - they provide the stable baseline for all comparisons
