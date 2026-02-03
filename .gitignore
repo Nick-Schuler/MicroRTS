@@ -15,3 +15,4 @@ benchmark_results_*.txt
 sources.list
 /logs/
 /traces/
+!/examples/traces/
