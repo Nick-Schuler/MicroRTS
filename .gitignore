@@ -14,3 +14,4 @@ tournament_results_*.json
 benchmark_results_*.txt
 sources.list
 /logs/
+/traces/
