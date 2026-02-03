@@ -187,5 +187,21 @@ public class Game {
         }
         ai1.gameOver(gs.winner());
         ai2.gameOver(gs.winner());
+
+        // Print clear game result for benchmark parsing
+        int winner = gs.winner();
+        int finalTick = gs.getTime();
+        System.out.println();
+        System.out.println("=== GAME RESULT ===");
+        System.out.println("FINAL_TICK: " + finalTick);
+        System.out.println("WINNER: " + winner);
+        if (winner == 0) {
+            System.out.println("Player 0 wins!");
+        } else if (winner == 1) {
+            System.out.println("Player 1 wins!");
+        } else {
+            System.out.println("Draw (no winner)");
+        }
+        System.out.println("===================");
     }
 }
