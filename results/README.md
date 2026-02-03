@@ -22,3 +22,4 @@ Contents:
 | 2026-02-02 04:07 | gemini-2.5-flash | RandomBiasedAI | 1 | Rate Limited (6 turns) | Interval=1 exhausts free tier instantly |
 | 2026-02-02 04:14 | gemini-2.5-flash | RandomBiasedAI | 100 | Rate Limited (600 turns) | LLM destroyed enemy base but lost all workers; pyrrhic victory |
 | 2026-02-02 05:34 | llama3.2:latest | RandomBiasedAI | 1 | Stopped (204 ticks) | **Fair game test**: Many JSON format errors, model struggles with prompt |
+| 2026-02-02 15:08 | llama3.2:latest | RandomBiasedAI | 1 | Lost (1089 ticks) | **Improved prompt**: 98.7% JSON success rate, eliminated format errors |
