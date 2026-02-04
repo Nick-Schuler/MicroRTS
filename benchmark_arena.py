@@ -1,14 +1,18 @@
 #!/usr/bin/env python3
 """
-MicroRTS LLM Benchmark Arena v1.0
+MicroRTS LLM Benchmark Arena v2.0
 
-Runs benchmarks against fixed reference AIs to produce comparable scores.
-New LLMs can be measured at any time and compared to historical results.
+Single-elimination benchmark against 6 reference AIs in ascending difficulty.
+LLMs must WIN to advance to the next opponent. A loss/draw/timeout eliminates.
 
-Scoring: Based purely on performance against reference AIs (anchors).
-- RandomBiasedAI (easy): 40 points max
-- WorkerRush (hard): 60 points max
-- Total: 0-100 scale
+Elimination order:
+  1. RandomBiasedAI (easy, 10 pts)
+  2. HeavyRush (medium-hard, 20 pts)
+  3. LightRush (medium, 15 pts)
+  4. WorkerRush (medium, 15 pts)
+  5. Tiamat (hard, 20 pts)
+  6. CoacAI (hard, 20 pts)
+  Total: 0-100 scale
 
 Usage:
     python3 benchmark_arena.py [--games N]
@@ -32,20 +36,40 @@ CONFIG_FILE = "resources/config.properties"
 RESULTS_DIR = "benchmark_results"
 MAX_CYCLES = 1500  # Further reduced for quick benchmarks
 MAP = "maps/8x8/basesWorkers8x8.xml"
-GAME_TIMEOUT = 600  # 10 minutes per game
+GAME_TIMEOUT = 900  # 15 minutes per game (hard opponents play longer)
 
-# Reference AI anchors with scoring weights
+# Reference AI anchors in single-elimination order (must win to advance)
 # These are FIXED - they provide the stable baseline for all comparisons
 ANCHORS = {
     "ai.RandomBiasedAI": {
         "name": "RandomBiasedAI",
-        "weight": 40,  # Easy anchor - 40 points max
-        "difficulty": "easy"
+        "weight": 10,  # Easy - sanity check
+        "tier": "easy"
+    },
+    "ai.abstraction.HeavyRush": {
+        "name": "HeavyRush",
+        "weight": 20,  # Medium-Hard - heavy unit pressure
+        "tier": "medium-hard"
+    },
+    "ai.abstraction.LightRush": {
+        "name": "LightRush",
+        "weight": 15,  # Medium - aggressive light units
+        "tier": "medium"
     },
     "ai.abstraction.WorkerRush": {
         "name": "WorkerRush",
-        "weight": 60,  # Hard anchor - 60 points max
-        "difficulty": "hard"
+        "weight": 15,  # Medium - aggressive workers
+        "tier": "medium"
+    },
+    "ai.competition.tiamat.Tiamat": {
+        "name": "Tiamat",
+        "weight": 20,  # Hard - competition-winning bot
+        "tier": "hard"
+    },
+    "ai.coac.CoacAI": {
+        "name": "CoacAI",
+        "weight": 20,  # Hard - competition-winning bot
+        "tier": "hard"
     },
 }
 
@@ -104,7 +128,7 @@ def run_game(ai1, ai2):
 
     try:
         result = subprocess.run(
-            ["java", "-cp", "lib/*:bin", "rts.MicroRTS", "-f", CONFIG_FILE],
+            ["java", "-cp", "lib/*:lib/bots/*:bin", "rts.MicroRTS", "-f", CONFIG_FILE],
             capture_output=True,
             text=True,
             timeout=GAME_TIMEOUT,
@@ -201,36 +225,232 @@ def calculate_benchmark_score(llm_results):
     return round(total_score, 1)
 
 
+def _score_to_grade(score):
+    """Convert a benchmark score (0-100) to a letter grade."""
+    if score >= 90:
+        return "A+"
+    elif score >= 80:
+        return "A"
+    elif score >= 70:
+        return "B"
+    elif score >= 60:
+        return "C"
+    elif score >= 40:
+        return "D"
+    else:
+        return "F"
+
+
+def _opponent_breakdown(reference_games):
+    """Build per-opponent stats dict from reference game results."""
+    breakdown = {}
+    for anchor_class, games in reference_games.items():
+        if anchor_class not in ANCHORS:
+            continue
+        anchor_info = ANCHORS[anchor_class]
+        wins = sum(1 for g in games if g["result"] == "win")
+        draws = sum(1 for g in games if g["result"] == "draw")
+        losses = sum(1 for g in games if g["result"] not in ("win", "draw"))
+        avg_score = sum(
+            calculate_game_score(g["result"], g["ticks"]) for g in games
+        ) / len(games) if games else 0.0
+        weighted_pts = round(avg_score * anchor_info["weight"], 1)
+        breakdown[anchor_info["name"]] = {
+            "wins": wins,
+            "draws": draws,
+            "losses": losses,
+            "avg_game_score": round(avg_score, 3),
+            "weighted_points": weighted_pts
+        }
+    return breakdown
+
+
+def generate_results_markdown(benchmark_scores, all_results, eliminated_at,
+                              h2h_results, games_per_pair, timestamp):
+    """Generate RESULTS.md with per-opponent columns in the leaderboard."""
+    sorted_scores = sorted(benchmark_scores.items(), key=lambda x: x[1], reverse=True)
+
+    # Build anchor name list in order
+    anchor_names = [info["name"] for info in ANCHORS.values()]
+
+    lines = []
+    lines.append("# MicroRTS LLM Benchmark Results")
+    lines.append("")
+    lines.append(f"## Latest Benchmark: {timestamp[:10]}")
+    lines.append("")
+    lines.append("### Configuration")
+    lines.append("")
+    lines.append("| Setting | Value |")
+    lines.append("|---------|-------|")
+    lines.append(f"| Map | `{MAP}` |")
+    lines.append(f"| Max Cycles | {MAX_CYCLES} |")
+    lines.append(f"| Games per Matchup | {games_per_pair} |")
+    lines.append(f"| Arena Version | 2.0 |")
+    lines.append(f"| Format | Single-elimination |")
+    lines.append("")
+    lines.append("### Scoring System")
+    lines.append("")
+    lines.append("Single-elimination: LLMs must **win** to advance. Draw/loss/timeout = eliminated.")
+    lines.append("")
+    lines.append("| # | Reference AI | Tier | Max Points |")
+    lines.append("|---|--------------|------|------------|")
+    for i, (anchor_class, info) in enumerate(ANCHORS.items(), 1):
+        lines.append(f"| {i} | {info['name']} | {info['tier']} | {info['weight']} |")
+    lines.append("")
+    lines.append("**Per-game scoring:**")
+    lines.append("- Win: 1.0 points (+ 0.2 bonus for fast wins)")
+    lines.append("- Draw: 0.5 points")
+    lines.append("- Loss/Timeout: 0.0 points")
+    lines.append("")
+    lines.append("---")
+    lines.append("")
+
+    # Leaderboard table with per-opponent columns
+    lines.append("## Leaderboard")
+    lines.append("")
+    header = "| Rank | Model | Score | Grade |"
+    sep = "|------|-------|-------|-------|"
+    for name in anchor_names:
+        header += f" {name} |"
+        sep += "------|"
+    lines.append(header)
+    lines.append(sep)
+
+    for rank, (llm_name, score) in enumerate(sorted_scores, 1):
+        grade = _score_to_grade(score)
+        row = f"| {rank} | {llm_name} | **{score}** | {grade} |"
+        # Per-opponent result summary
+        results = all_results.get(llm_name, {}).get("reference_games", {})
+        past_elimination = False
+        for anchor_class in ANCHORS:
+            anchor_name = ANCHORS[anchor_class]["name"]
+            games = results.get(anchor_class, [])
+            if past_elimination:
+                row += " -- |"
+            elif games:
+                wins = sum(1 for g in games if g["result"] == "win")
+                draws = sum(1 for g in games if g["result"] == "draw")
+                losses = len(games) - wins - draws
+                row += f" {wins}W/{draws}D/{losses}L |"
+                if not any(g["result"] == "win" for g in games):
+                    past_elimination = True
+            else:
+                row += " -- |"
+                past_elimination = True
+        lines.append(row)
+
+    lines.append("")
+    lines.append("---")
+    lines.append("")
+
+    # Detailed per-model breakdown
+    lines.append("## Detailed Results")
+    lines.append("")
+
+    for llm_name, score in sorted_scores:
+        elim = eliminated_at.get(llm_name)
+        elim_note = f" -- eliminated at {elim}" if elim else " -- cleared all"
+        lines.append(f"### {llm_name} (Score: {score}{elim_note})")
+        lines.append("")
+        lines.append("| Opponent | Tier | Result | Ticks | Game Score | Weight | Points |")
+        lines.append("|----------|------|--------|-------|------------|--------|--------|")
+
+        results = all_results.get(llm_name, {}).get("reference_games", {})
+        for anchor_class, anchor_info in ANCHORS.items():
+            games = results.get(anchor_class, [])
+            if not games:
+                lines.append(
+                    f"| {anchor_info['name']} | {anchor_info['tier']} | "
+                    f"-- | -- | -- | {anchor_info['weight']} | 0.0 |"
+                )
+                continue
+            for g in games:
+                result_str = g["result"].upper()
+                ticks = g["ticks"]
+                game_score = calculate_game_score(g["result"], g["ticks"])
+                weighted = game_score * anchor_info["weight"]
+                lines.append(
+                    f"| {anchor_info['name']} | {anchor_info['tier']} | "
+                    f"{result_str} | {ticks} | {game_score:.2f} | "
+                    f"{anchor_info['weight']} | {weighted:.1f} |"
+                )
+        lines.append("")
+
+    lines.append("---")
+    lines.append("")
+
+    # Head-to-head
+    if h2h_results:
+        lines.append("## Head-to-Head Results (Supplementary)")
+        lines.append("")
+        lines.append("These games do not affect benchmark scores but show relative performance between LLMs.")
+        lines.append("")
+        lines.append("| Player 1 | Player 2 | Result | Ticks |")
+        lines.append("|----------|----------|--------|-------|")
+        for h in h2h_results:
+            lines.append(f"| {h['player0']} | {h['player1']} | {h['result'].upper()} | {h['ticks']} |")
+        lines.append("")
+        lines.append("---")
+        lines.append("")
+
+    # Grade scale
+    lines.append("## Grade Scale")
+    lines.append("")
+    lines.append("| Grade | Score Range | Description |")
+    lines.append("|-------|-------------|-------------|")
+    lines.append("| A+ | 90-100 | Excellent - beats hard AIs consistently |")
+    lines.append("| A | 80-89 | Very Good - competes with hard AIs |")
+    lines.append("| B | 70-79 | Good - beats medium, challenges hard |")
+    lines.append("| C | 60-69 | Average - beats easy and some medium |")
+    lines.append("| D | 40-59 | Below Average - draws common |")
+    lines.append("| F | 0-39 | Failing - losses/timeouts |")
+    lines.append("")
+    lines.append("---")
+    lines.append("")
+    lines.append(f"*Generated by benchmark_arena.py v2.0 (single-elimination) on {timestamp[:10]}*")
+    lines.append("")
+
+    return "\n".join(lines)
+
+
 def run_tournament(games_per_pair=1):
-    """Run benchmark tournament."""
+    """Run single-elimination benchmark tournament."""
     print("=" * 60)
-    print("MicroRTS LLM Benchmark v1.0")
+    print("MicroRTS LLM Benchmark Arena v2.0 (Single-Elimination)")
     print("=" * 60)
     print(f"Date: {datetime.now().strftime('%Y-%m-%d %H:%M')}")
     print(f"Map: {MAP}")
     print(f"Max Cycles: {MAX_CYCLES}")
     print(f"Games per matchup: {games_per_pair}")
     print()
-    print("Scoring: Reference-based (comparable across tournaments)")
-    print(f"  - RandomBiasedAI (easy): {ANCHORS['ai.RandomBiasedAI']['weight']} pts max")
-    print(f"  - WorkerRush (hard): {ANCHORS['ai.abstraction.WorkerRush']['weight']} pts max")
+    print("Single-elimination: must WIN to advance (draw/loss/timeout = out)")
+    print(f"  Elimination order ({len(ANCHORS)} opponents, 100 pts total):")
+    for i, (anchor_class, info) in enumerate(ANCHORS.items(), 1):
+        print(f"    {i}. {info['name']} ({info['tier']}): {info['weight']} pts max")
     print()
 
     # Results storage
     all_results = {}
     benchmark_scores = {}
+    eliminated_at = {}  # llm_name -> anchor_name where eliminated (or None)
 
-    # Phase 1: Each LLM vs each Reference AI
-    print("BENCHMARK GAMES (vs Reference AIs)")
+    # Phase 1: Each LLM vs Reference AIs (single-elimination)
+    print("BENCHMARK GAMES (single-elimination)")
     print("-" * 40)
 
     for llm_class, llm_info in LLMS.items():
         llm_name = llm_info["display"]
         all_results[llm_name] = {"reference_games": {}, "llm_games": []}
+        eliminated_at[llm_name] = None
+        eliminated = False
 
         print(f"\n{llm_name}:")
 
         for anchor_class, anchor_info in ANCHORS.items():
+            if eliminated:
+                # Skip remaining opponents after elimination
+                break
+
             all_results[llm_name]["reference_games"][anchor_class] = []
 
             for game_num in range(games_per_pair):
@@ -238,6 +458,17 @@ def run_tournament(games_per_pair=1):
                 result["game_num"] = game_num + 1
                 result["opponent"] = anchor_info["name"]
                 all_results[llm_name]["reference_games"][anchor_class].append(result)
+
+            # Check if LLM won at least one game against this opponent
+            games = all_results[llm_name]["reference_games"][anchor_class]
+            has_win = any(g["result"] == "win" for g in games)
+            if not has_win:
+                eliminated = True
+                eliminated_at[llm_name] = anchor_info["name"]
+                print(f"  ** ELIMINATED at {anchor_info['name']} (no win) **")
+
+        if not eliminated:
+            print(f"  ** CLEARED ALL OPPONENTS **")
 
         # Calculate benchmark score for this LLM
         benchmark_scores[llm_name] = calculate_benchmark_score(
@@ -275,27 +506,16 @@ def run_tournament(games_per_pair=1):
     # Sort by score
     sorted_scores = sorted(benchmark_scores.items(), key=lambda x: x[1], reverse=True)
 
-    print("BENCHMARK SCORES (0-100, comparable across tournaments)")
-    print("-" * 50)
-    print(f"{'Rank':<6}{'Model':<25}{'Score':<10}{'Grade'}")
-    print("-" * 50)
+    print("BENCHMARK SCORES (0-100, single-elimination)")
+    print("-" * 60)
+    print(f"{'Rank':<6}{'Model':<25}{'Score':<10}{'Grade':<8}{'Eliminated at'}")
+    print("-" * 60)
 
     for rank, (llm_name, score) in enumerate(sorted_scores, 1):
-        # Assign grade
-        if score >= 90:
-            grade = "A+"
-        elif score >= 80:
-            grade = "A"
-        elif score >= 70:
-            grade = "B"
-        elif score >= 60:
-            grade = "C"
-        elif score >= 40:
-            grade = "D"
-        else:
-            grade = "F"
-
-        print(f"{rank:<6}{llm_name:<25}{score:<10}{grade}")
+        grade = _score_to_grade(score)
+        elim = eliminated_at.get(llm_name)
+        elim_str = elim if elim else "-- cleared all --"
+        print(f"{rank:<6}{llm_name:<25}{score:<10}{grade:<8}{elim_str}")
 
     print()
 
@@ -304,7 +524,9 @@ def run_tournament(games_per_pair=1):
     print("-" * 50)
 
     for llm_name, results in all_results.items():
-        print(f"\n{llm_name}:")
+        elim = eliminated_at.get(llm_name)
+        elim_note = f" (eliminated at {elim})" if elim else " (cleared all)"
+        print(f"\n{llm_name}{elim_note}:")
         for anchor_class, games in results["reference_games"].items():
             anchor_name = ANCHORS[anchor_class]["name"]
             weight = ANCHORS[anchor_class]["weight"]
@@ -314,7 +536,7 @@ def run_tournament(games_per_pair=1):
                 ticks = g["ticks"]
                 game_score = calculate_game_score(g["result"], g["ticks"])
                 weighted = game_score * weight
-                print(f"  vs {anchor_name}: {result_str} ({ticks} ticks) → {game_score:.2f} × {weight} = {weighted:.1f} pts")
+                print(f"  vs {anchor_name}: {result_str} ({ticks} ticks) -> {game_score:.2f} x {weight} = {weighted:.1f} pts")
 
     print()
 
@@ -340,19 +562,34 @@ def run_tournament(games_per_pair=1):
 
     # Save results
     Path(RESULTS_DIR).mkdir(exist_ok=True)
-    timestamp = datetime.now().strftime('%Y-%m-%d_%H-%M')
+    now = datetime.now()
+    timestamp = now.strftime('%Y-%m-%d_%H-%M')
+
+    # Build per-opponent breakdown for each LLM
+    opponent_breakdowns = {}
+    for llm_name, results in all_results.items():
+        opponent_breakdowns[llm_name] = _opponent_breakdown(
+            results["reference_games"]
+        )
 
     results_file = f"{RESULTS_DIR}/benchmark_{timestamp}.json"
     with open(results_file, 'w') as f:
         json.dump({
-            "version": "1.0",
-            "date": datetime.now().isoformat(),
+            "version": "2.0",
+            "format": "single-elimination",
+            "date": now.isoformat(),
             "config": {
                 "map": MAP,
                 "max_cycles": MAX_CYCLES,
                 "games_per_matchup": games_per_pair
             },
+            "anchors": {
+                cls: {"name": info["name"], "weight": info["weight"], "tier": info["tier"]}
+                for cls, info in ANCHORS.items()
+            },
             "benchmark_scores": benchmark_scores,
+            "eliminated_at": eliminated_at,
+            "opponent_breakdown": opponent_breakdowns,
             "detailed_results": all_results,
             "head_to_head": h2h_results
         }, f, indent=2)
@@ -371,15 +608,28 @@ def run_tournament(games_per_pair=1):
         leaderboard["entries"].append({
             "model": llm_name,
             "score": score,
-            "date": datetime.now().isoformat(),
+            "version": "2.0",
+            "date": now.isoformat(),
             "map": MAP,
-            "games_per_matchup": games_per_pair
+            "games_per_matchup": games_per_pair,
+            "opponents": opponent_breakdowns.get(llm_name, {})
         })
 
     with open(leaderboard_file, 'w') as f:
         json.dump(leaderboard, f, indent=2)
 
     print(f"Leaderboard updated: {leaderboard_file}")
+
+    # Generate RESULTS.md
+    results_md = generate_results_markdown(
+        benchmark_scores, all_results, eliminated_at,
+        h2h_results, games_per_pair, now.isoformat()
+    )
+    results_md_file = f"{RESULTS_DIR}/RESULTS.md"
+    with open(results_md_file, 'w') as f:
+        f.write(results_md)
+
+    print(f"Results markdown: {results_md_file}")
 
     return benchmark_scores
 

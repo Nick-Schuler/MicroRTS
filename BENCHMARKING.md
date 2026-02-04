@@ -45,20 +45,27 @@ Supported models (via Ollama):
 
 ### Opponents
 
-In `resources/config.properties`:
+The benchmark arena (v2.0) uses **single-elimination** against 6 reference AIs. LLMs must **win** to advance to the next opponent. A draw, loss, or timeout eliminates.
 
-```properties
-AI2=ai.RandomBiasedAI    # Standard benchmark opponent
-```
+| # | Opponent | Class | Tier | Weight | Description |
+|---|----------|-------|------|--------|-------------|
+| 1 | RandomBiasedAI | `ai.RandomBiasedAI` | Easy | 10 pts | Prefers useful actions |
+| 2 | HeavyRush | `ai.abstraction.HeavyRush` | Medium-Hard | 20 pts | Heavy unit pressure |
+| 3 | LightRush | `ai.abstraction.LightRush` | Medium | 15 pts | Aggressive light units |
+| 4 | WorkerRush | `ai.abstraction.WorkerRush` | Medium | 15 pts | Aggressive workers |
+| 5 | Tiamat | `ai.competition.tiamat.Tiamat` | Hard | 20 pts | Competition-winning bot |
+| 6 | CoacAI | `ai.coac.CoacAI` | Hard | 20 pts | Competition-winning bot |
 
-Available baseline opponents:
+Total: **100 points**. If an LLM can't beat an easier opponent, there's no point playing harder ones.
+
+**Note:** CoacAI and Tiamat require the bot JARs in `lib/bots/`. The arena uses classpath `lib/*:lib/bots/*:bin`.
+
+Additional opponents (not in benchmark, for manual testing):
+
 | Opponent | Difficulty | Description |
 |----------|------------|-------------|
 | `ai.PassiveAI` | Trivial | Does nothing |
 | `ai.RandomAI` | Very Easy | Random valid actions |
-| `ai.RandomBiasedAI` | Easy | Prefers useful actions |
-| `ai.abstraction.LightRush` | Medium | Aggressive light units |
-| `ai.abstraction.HeavyRush` | Medium | Aggressive heavy units |
 
 ### Game Settings
 
@@ -90,6 +97,35 @@ for model in "llama3.1:8b" "qwen3:14b" "mistral"; do
     ./benchmark.sh
 done
 ```
+
+### Benchmark Arena (Recommended)
+
+```bash
+# Run full benchmark (all LLMs vs all 6 reference AIs)
+python3 benchmark_arena.py
+
+# Run with multiple games per matchup
+python3 benchmark_arena.py --games 3
+```
+
+This produces:
+- `benchmark_results/benchmark_YYYY-MM-DD_HH-MM.json` (detailed results)
+- `benchmark_results/RESULTS.md` (formatted report)
+- `benchmark_results/leaderboard.json` (appended entries)
+
+### Generating the Consolidated Leaderboard
+
+After running one or more benchmarks:
+
+```bash
+python3 generate_leaderboard.py
+```
+
+This reads all `benchmark_results/benchmark_*.json` files, finds the best score per model, and generates:
+- `benchmark_results/leaderboard.json` (consolidated best-score-per-model)
+- `benchmark_results/LEADERBOARD.md` (rich per-opponent breakdown table)
+
+Both v1.0 (2 opponents) and v2.0 (6 opponents) result files are handled. Scores from different versions are not directly comparable.
 
 ### Using RunLoop for Multiple Games
 
@@ -194,15 +230,18 @@ See [GPU_SETUP.md](GPU_SETUP.md) for detailed HPC instructions.
 
 ## Interpreting Results
 
-### Win Rate by Opponent
+### Expected Win Rates (Elimination Order)
 
-| Opponent | Expected LLM Win Rate (Good Agent) |
-|----------|-----------------------------------|
-| PassiveAI | 100% |
-| RandomAI | 90%+ |
-| RandomBiasedAI | 70%+ |
-| LightRush | 50%+ |
-| HeavyRush | 50%+ |
+| # | Opponent | Tier | Expected Win Rate (Good LLM) |
+|---|----------|------|------------------------------|
+| 1 | RandomBiasedAI | Easy | 80%+ |
+| 2 | HeavyRush | Medium-Hard | 30-50% |
+| 3 | LightRush | Medium | 50-70% |
+| 4 | WorkerRush | Medium | 50-70% |
+| 5 | Tiamat | Hard | 10-30% |
+| 6 | CoacAI | Hard | 10-30% |
+
+**Score interpretation:** An LLM eliminated at RandomBiasedAI scores 0-12 (F). Clearing easy+medium opponents: ~40-60 (D-C). Competing with hard AIs: 70-100 (B to A+).
 
 ### Common Failure Modes
 
