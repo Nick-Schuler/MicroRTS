@@ -14,15 +14,91 @@ MicroRTS provides a controlled environment to measure:
 
 ---
 
+## Benchmark Results (2026-02-05)
+
+### Leaderboard
+
+18 entries tested across 7 models, 3 agent architectures, local and cloud inference.
+
+| Rank | Model | Size | Agent Type | Score | Grade | Cleared | Eliminated at |
+|------|-------|------|------------|-------|-------|---------|---------------|
+| 1 | **qwen3:14b** | 14B local | Search+LLM | **119.0** | **A+** | 6/6 | cleared all |
+| 2 | **deepseek-chat (V3)** | 671B cloud | Search+LLM | **96.0** | **A+** | 5/6 | CoacAI |
+| 3 | gemma3 | 4B local | Hybrid | 69.0 | C | 4/6 | Tiamat |
+| 3 | llama3.1:8b | 8B local | Search+LLM | 69.0 | C | 4/6 | Tiamat |
+| 3 | qwen3:14b | 14B local | Hybrid | 69.0 | C | 4/6 | Tiamat |
+| 6 | deepseek-chat (V3) | 671B cloud | Hybrid | 54.0 | D | 3/6 | WorkerRush |
+| 6 | deepseek-r1:8b | 8B local | Hybrid | 54.0 | D | 3/6 | WorkerRush |
+| 6 | deepseek-r1:8b | 8B local | Search+LLM | 54.0 | D | 3/6 | WorkerRush |
+| 6 | gemma3 | 4B local | Search+LLM | 54.0 | D | 3/6 | WorkerRush |
+| 6 | llama3.1:8b | 8B local | Hybrid | 54.0 | D | 3/6 | WorkerRush |
+| 6 | llama3.2 | 3B local | Hybrid | 54.0 | D | 3/6 | WorkerRush |
+| 12 | llama3.2 | 3B local | Search+LLM | 36.0 | F | 2/6 | LightRush |
+| 13 | gemini-2.5-flash | cloud | PureLLM | 5.0 | F | 0/6 | RandomBiasedAI |
+| 14 | llama3.1:8b | 8B local | PureLLM | 0.0 | F | 0/6 | RandomBiasedAI |
+| 14 | qwen3:4b | 4B local | PureLLM | 0.0 | F | 0/6 | RandomBiasedAI |
+
+Score can exceed 100 due to efficiency bonuses (+0.2 for wins under 50% max_cycles, +0.1 for under 75%).
+
+### Per-Model Summary
+
+| Model | Parameters | Hybrid | Search+LLM | Best | Notes |
+|-------|-----------|--------|------------|------|-------|
+| qwen3:14b | 14B | 69 (C) | **119 (A+)** | A+ | Only model to clear all 6 opponents |
+| deepseek-chat (V3) | 671B MoE | 54 (D) | **96 (A+)** | A+ | Cloud API; beat Tiamat, fell to CoacAI |
+| gemma3 | 4B | **69 (C)** | 54 (D) | C | Hybrid outperformed Search+LLM |
+| llama3.1:8b | 8B | 54 (D) | **69 (C)** | C | Search+LLM beat WorkerRush |
+| deepseek-r1:8b | 8B | 54 (D) | 54 (D) | D | Reasoning mode didn't help |
+| llama3.2 | 3B | **54 (D)** | 36 (F) | D | Smallest model; Search+LLM failed at LightRush |
+| qwen3:4b | 4B | - | - | F | Only tested PureLLM (0 pts) |
+
+### Key Findings
+
+1. **Agent architecture matters more than model size.** A 14B local model with MCTS search (qwen3:14b Search+LLM, 119 pts) outperformed a 671B cloud model (DeepSeek-V3 Search+LLM, 96 pts). Fast local inference gives the search algorithm more iterations per time budget.
+
+2. **WorkerRush is the gatekeeper.** Every model under 14B parameters gets eliminated here (54 pts ceiling). Only qwen3:14b and DeepSeek-V3 with Search+LLM broke through.
+
+3. **PureLLM is unusable without a fast GPU.** Calling an LLM every game tick is orders of magnitude too slow on CPU. All PureLLM agents scored 0-5 pts.
+
+4. **Hybrid can outperform Search+LLM for smaller models.** gemma3 (4B) Hybrid scored 69 while its Search+LLM scored 54. When the model can't provide good policy priors, MCTS overhead hurts more than it helps.
+
+5. **Reasoning models don't help.** deepseek-r1:8b's chain-of-thought reasoning just slowed inference with no strategic benefit (54 pts in both architectures, same as llama3.1:8b Hybrid).
+
+6. **Parameter count isn't everything.** gemma3 at 4B matched qwen3:14b at 14B in Hybrid mode (both 69 pts, both eliminated at Tiamat).
+
+7. **Cloud API benchmarking is cheap.** A full DeepSeek-V3 benchmark run (~30 API calls) cost approximately $0.05.
+
+### Agent Architecture Comparison
+
+```
+Score by Architecture (best model in each tier):
+
+Search+LLM:  ████████████████████████████████████████████████  119 (qwen3:14b)
+Hybrid:      ██████████████████████████████                     69 (gemma3/qwen3:14b)
+PureLLM:     ██                                                  5 (gemini-2.5-flash)
+```
+
+The three agent architectures represent fundamentally different approaches:
+
+| Architecture | Strengths | Weaknesses | Best For |
+|-------------|-----------|------------|----------|
+| **Search+LLM** | Deep tactical play via MCTS; LLM provides strategic direction | Slow with weak models; needs fast inference | Large models (14B+) or fast cloud APIs |
+| **Hybrid** | Fast execution; robust even with small models | No lookahead; relies on predefined strategies | Small models (4-8B); CPU-only setups |
+| **PureLLM** | Most direct use of LLM intelligence | Far too slow on CPU; inference bottleneck | GPU-only; research/demonstration |
+
+---
+
 ## Quick Start
 
 ```bash
-# 1. Start Ollama (GPU recommended)
-srun --gres=gpu:1 --pty bash  # If on HPC
+# 1. Start Ollama
 ollama serve &
 
-# 2. Run the benchmark
-./benchmark.sh
+# 2. Run the benchmark arena
+python3 benchmark_arena.py
+
+# 3. Generate consolidated leaderboard
+python3 generate_leaderboard.py
 ```
 
 ---
@@ -31,17 +107,22 @@ ollama serve &
 
 ### Models to Test
 
-Edit `benchmark.sh` or set environment variables:
+Set environment variables before running:
 
 ```bash
-export OLLAMA_MODEL="llama3.1:8b"   # Model under test
+export OLLAMA_MODEL="qwen3:14b"   # Model under test
 ```
 
-Supported models (via Ollama):
+Tested local models (via Ollama):
+- `qwen3:14b` - Alibaba Qwen 3 14B (best local performer)
 - `llama3.1:8b` - Meta Llama 3.1 8B
-- `qwen3:14b` - Alibaba Qwen 3 14B
-- `mistral` - Mistral 7B
-- `llama3.3:70b` - Meta Llama 3.3 70B (requires ~42GB VRAM)
+- `gemma3` - Google Gemma 3 4B
+- `deepseek-r1:8b` - DeepSeek R1 8B (reasoning)
+- `llama3.2` - Meta Llama 3.2 3B
+- `qwen3:4b` - Alibaba Qwen 3 4B
+
+Cloud models (via `openai_proxy.py`):
+- `deepseek-chat` - DeepSeek V3 671B MoE
 
 ### Opponents
 
@@ -60,13 +141,6 @@ Total: **100 points**. If an LLM can't beat an easier opponent, there's no point
 
 **Note:** CoacAI and Tiamat require the bot JARs in `lib/bots/`. The arena uses classpath `lib/*:lib/bots/*:bin`.
 
-Additional opponents (not in benchmark, for manual testing):
-
-| Opponent | Difficulty | Description |
-|----------|------------|-------------|
-| `ai.PassiveAI` | Trivial | Does nothing |
-| `ai.RandomAI` | Very Easy | Random valid actions |
-
 ### Game Settings
 
 In `resources/config.properties`:
@@ -81,30 +155,13 @@ headless=true                               # No GUI
 
 ## Running Benchmarks
 
-### Single Model Test
-
-```bash
-# Set model and run
-export OLLAMA_MODEL="llama3.1:8b"
-./benchmark.sh
-```
-
-### Multi-Model Comparison
-
-```bash
-for model in "llama3.1:8b" "qwen3:14b" "mistral"; do
-    export OLLAMA_MODEL="$model"
-    ./benchmark.sh
-done
-```
-
 ### Benchmark Arena (Recommended)
 
 ```bash
-# Run full benchmark (all LLMs vs all 6 reference AIs)
+# Run full benchmark (all configured LLMs vs all 6 reference AIs)
 python3 benchmark_arena.py
 
-# Run with multiple games per matchup
+# Run with multiple games per matchup for more reliable results
 python3 benchmark_arena.py --games 3
 ```
 
@@ -112,6 +169,76 @@ This produces:
 - `benchmark_results/benchmark_YYYY-MM-DD_HH-MM.json` (detailed results)
 - `benchmark_results/RESULTS.md` (formatted report)
 - `benchmark_results/leaderboard.json` (appended entries)
+
+### Benchmarking a Specific Local Model
+
+```bash
+# Set model and run only Hybrid + Search+LLM (skip PureLLM on CPU)
+OLLAMA_MODEL=qwen3:14b python3 -c "
+import os, sys
+os.environ['OLLAMA_MODEL'] = 'qwen3:14b'
+import benchmark_arena as ba
+model = os.environ['OLLAMA_MODEL']
+ba.LLMS = {
+    'ai.abstraction.HybridLLMRush': {
+        'name': 'hybrid', 'display': f'{model} (Hybrid)',
+        'agent_type': 'Hybrid', 'env': {'OLLAMA_MODEL': model}
+    },
+    'ai.mcts.llmguided.LLMInformedMCTS': {
+        'name': 'mcts', 'display': f'{model} (Search+LLM)',
+        'agent_type': 'Search+LLM', 'env': {'OLLAMA_MODEL': model}
+    },
+}
+ba.run_tournament(games_per_pair=1)
+"
+```
+
+### Batch Benchmarking Multiple Local Models
+
+```bash
+python3 run_phase1_benchmarks.py
+```
+
+Edit `MODELS_TO_TEST` in the script to change which models are tested.
+
+### Benchmarking Cloud Models
+
+Use `openai_proxy.py` to translate the Ollama protocol to OpenAI-compatible cloud APIs:
+
+```bash
+# Terminal 1: Start the proxy
+DEEPSEEK_API_KEY=sk-... python3 openai_proxy.py --provider deepseek --port 11435
+
+# Terminal 2: Run the benchmark pointing at the proxy
+OLLAMA_HOST=http://localhost:11435 OLLAMA_MODEL=deepseek-chat python3 -c "
+import os, sys
+os.environ['OLLAMA_HOST'] = 'http://localhost:11435'
+os.environ['OLLAMA_MODEL'] = 'deepseek-chat'
+import benchmark_arena as ba
+model = os.environ['OLLAMA_MODEL']
+ba.LLMS = {
+    'ai.abstraction.HybridLLMRush': {
+        'name': 'hybrid', 'display': f'{model} (Hybrid)',
+        'agent_type': 'Hybrid',
+        'env': {'OLLAMA_MODEL': model, 'OLLAMA_HOST': 'http://localhost:11435'}
+    },
+    'ai.mcts.llmguided.LLMInformedMCTS': {
+        'name': 'mcts', 'display': f'{model} (Search+LLM)',
+        'agent_type': 'Search+LLM',
+        'env': {'OLLAMA_MODEL': model, 'OLLAMA_HOST': 'http://localhost:11435'}
+    },
+}
+ba.run_tournament(games_per_pair=1)
+"
+```
+
+Supported cloud providers:
+
+| Provider | Env Variable | Models | API Cost (approx.) |
+|----------|-------------|--------|-------------------|
+| DeepSeek | `DEEPSEEK_API_KEY` | `deepseek-chat`, `deepseek-reasoner` | ~$0.05/run |
+| OpenAI | `OPENAI_API_KEY` | `gpt-4o`, `gpt-4o-mini` | ~$0.50/run |
+| OpenRouter | `OPENROUTER_API_KEY` | Any model | Varies |
 
 ### Generating the Consolidated Leaderboard
 
@@ -127,185 +254,116 @@ This reads all `benchmark_results/benchmark_*.json` files, finds the best score 
 
 Both v1.0 (2 opponents) and v2.0 (6 opponents) result files are handled. Scores from different versions are not directly comparable.
 
-### Using RunLoop for Multiple Games
+---
 
-```bash
-# Edit RunLoop.sh settings
-TOTAL_RUNS=10            # Games per session
-RUN_TIME_PER_GAME_SEC=300  # Timeout per game
+## Scoring System
 
-./RunLoop.sh
-```
+### Single-Elimination Format
+
+LLMs face opponents in order of difficulty. They must **win** to advance. A draw, loss, or timeout eliminates them immediately.
+
+### Per-Game Scoring
+
+| Result | Base Score | Efficiency Bonus | Max Score |
+|--------|-----------|-----------------|-----------|
+| Win | 1.0 | +0.2 if < 50% max_cycles; +0.1 if < 75% | 1.2 |
+| Draw | 0.5 | None | 0.5 |
+| Loss/Timeout | 0.0 | None | 0.0 |
+
+**Final Score** = Sum of (game_score x opponent_weight) across all opponents played.
+
+### Grade Scale
+
+| Grade | Score Range | Description |
+|-------|-------------|-------------|
+| A+ | 90-100+ | Excellent - beats hard AIs consistently |
+| A | 80-89 | Very Good - competes with hard AIs |
+| B | 70-79 | Good - beats medium, challenges hard |
+| C | 60-69 | Average - beats easy and some medium |
+| D | 40-59 | Below Average - draws common |
+| F | 0-39 | Failing - losses/timeouts |
 
 ---
 
-## Output Format
+## LLM Agent Types
 
-### Benchmark Results
+Three architectures are available for LLM integration, each with different tradeoffs:
 
-Output files: `benchmark_results_YYYY-MM-DD_HH-MM-SS.txt`
+### PureLLM (Not recommended on CPU)
 
-```
-model=llama3.1:8b opponent=RandomBiasedAI map=8x8/basesWorkers8x8 game=1 winner=LLM ticks=4321 crashed=no
-model=llama3.1:8b opponent=RandomBiasedAI map=8x8/basesWorkers8x8 game=2 winner=Opponent ticks=3892 crashed=no
-```
+**Classes:** `ai.abstraction.ollama`, `ollama2`, `LLM_Gemini`
 
-### CSV Game Logs
+The LLM is called every game tick to decide all unit actions. This requires sub-second inference to be competitive, which is only feasible with a fast GPU or low-latency cloud API.
 
-Output files: `Response<TIMESTAMP>_<AI1>_<AI2>_<MODEL>.csv`
+### Hybrid
 
-Contains per-game statistics including scores and actions.
+**Class:** `ai.abstraction.HybridLLMRush`
 
-### Detailed Logs
+Rule-based strategy execution with periodic LLM consultation (~every 200 ticks). The LLM picks a high-level strategy (WORKER_RUSH, LIGHT_RUSH, HEAVY_RUSH, RANGED_RUSH) and the agent executes it autonomously until the next consultation.
 
-The `logs/` directory contains detailed game traces including LLM responses.
+Best for small models (4-8B) where fast execution outweighs strategic depth.
 
----
+### Search+LLM
 
-## Metrics
+**Class:** `ai.mcts.llmguided.LLMInformedMCTS`
 
-### Primary Metrics
+Monte Carlo Tree Search biased by LLM policy priors (cached ~300 ticks) and strategic goal evaluation (cached ~500 ticks). The LLM provides high-level direction while MCTS handles tactical decisions through lookahead search.
 
-| Metric | Description |
-|--------|-------------|
-| **Win Rate** | Percentage of games won against opponent |
-| **Average Game Length** | Mean ticks to game completion |
-| **Crash Rate** | Percentage of games with invalid actions |
-
-### Secondary Metrics
-
-| Metric | Description |
-|--------|-------------|
-| **Response Time** | Average LLM inference time |
-| **Valid Action Rate** | Percentage of LLM actions that were valid |
-| **Resource Efficiency** | Resources gathered vs spent |
-
----
-
-## Hardware Requirements
-
-### Minimum (CPU)
-- Any modern CPU
-- 16GB RAM
-- **Warning:** CPU inference is too slow for real-time play; games will timeout
-
-### Recommended (GPU)
-- NVIDIA GPU with 8GB+ VRAM
-- 16GB+ system RAM
-- GPU provides ~10-50x faster inference
-
-### Model VRAM Requirements
-
-| Model | VRAM Required |
-|-------|---------------|
-| llama3.1:8b | ~5GB |
-| qwen3:14b | ~9GB |
-| mistral | ~5GB |
-| llama3.3:70b | ~42GB |
-
----
-
-## HPC Cluster Usage
-
-### Request GPU Resources
-
-```bash
-# Interactive
-srun --gres=gpu:1 --pty bash
-
-# Batch job
-sbatch benchmark_gpu.sh
-```
-
-### Verify GPU Access
-
-```bash
-nvidia-smi                    # Should show GPU info
-ollama ps                     # Should show "100% GPU" not "100% CPU"
-```
-
-See [GPU_SETUP.md](GPU_SETUP.md) for detailed HPC instructions.
-
----
-
-## Interpreting Results
-
-### Expected Win Rates (Elimination Order)
-
-| # | Opponent | Tier | Expected Win Rate (Good LLM) |
-|---|----------|------|------------------------------|
-| 1 | RandomBiasedAI | Easy | 80%+ |
-| 2 | HeavyRush | Medium-Hard | 30-50% |
-| 3 | LightRush | Medium | 50-70% |
-| 4 | WorkerRush | Medium | 50-70% |
-| 5 | Tiamat | Hard | 10-30% |
-| 6 | CoacAI | Hard | 10-30% |
-
-**Score interpretation:** An LLM eliminated at RandomBiasedAI scores 0-12 (F). Clearing easy+medium opponents: ~40-60 (D-C). Competing with hard AIs: 70-100 (B to A+).
-
-### Common Failure Modes
-
-1. **Timeout** - LLM inference too slow (use GPU)
-2. **Invalid JSON** - LLM doesn't follow response format
-3. **Invalid Actions** - Actions reference wrong positions or unit types
-4. **Poor Strategy** - Valid actions but loses to opponent
+Best for capable models (14B+) that can provide good strategic priors.
 
 ---
 
 ## LLM vs LLM Games
 
-You can run two LLMs against each other to compare their strategic capabilities.
-
-### Using Different Ollama Models
+You can run two LLMs against each other:
 
 ```bash
 # Set different models for each player
 export OLLAMA_MODEL="llama3.1:8b"      # Player 0
 export OLLAMA_MODEL_P2="qwen3:4b"      # Player 1
 
-# Update config.properties
+# Update config.properties:
 # AI1=ai.abstraction.ollama
 # AI2=ai.abstraction.ollama2
-```
-
-### Using Ollama vs Gemini
-
-```bash
-# Set Ollama model for Player 0
-export OLLAMA_MODEL="llama3.1:8b"
-
-# Set Gemini API key for Player 1
-export GEMINI_API_KEY="your-api-key"
-
-# Update config.properties
-# AI1=ai.abstraction.ollama
-# AI2=ai.abstraction.LLM_Gemini
 ```
 
 ### Available LLM AI Classes
 
 | Class | Environment Variables | Description |
 |-------|----------------------|-------------|
-| `ai.abstraction.ollama` | `OLLAMA_MODEL`, `OLLAMA_HOST` | Primary Ollama agent |
-| `ai.abstraction.ollama2` | `OLLAMA_MODEL_P2`, `OLLAMA_HOST` | Second Ollama agent (different model) |
-| `ai.abstraction.LLM_Gemini` | `GEMINI_API_KEY` | Google Gemini API |
+| `ai.abstraction.ollama` | `OLLAMA_MODEL`, `OLLAMA_HOST` | Primary Ollama agent (PureLLM) |
+| `ai.abstraction.ollama2` | `OLLAMA_MODEL_P2`, `OLLAMA_HOST` | Second Ollama agent (PureLLM) |
+| `ai.abstraction.HybridLLMRush` | `OLLAMA_MODEL`, `OLLAMA_HOST` | Hybrid strategy agent |
+| `ai.abstraction.StrategicLLMAgent` | `OLLAMA_MODEL`, `OLLAMA_HOST` | Enhanced 8-strategy agent |
+| `ai.mcts.llmguided.LLMInformedMCTS` | `OLLAMA_MODEL`, `OLLAMA_HOST` | MCTS with LLM priors |
+| `ai.abstraction.LLM_Gemini` | `GEMINI_API_KEY` | Google Gemini API (PureLLM) |
 
-### Example: LLM Tournament
+---
 
-```bash
-#!/bin/bash
-models=("llama3.1:8b" "qwen3:4b" "mistral:7b")
-for m1 in "${models[@]}"; do
-    for m2 in "${models[@]}"; do
-        if [ "$m1" != "$m2" ]; then
-            export OLLAMA_MODEL="$m1"
-            export OLLAMA_MODEL_P2="$m2"
-            echo "Running: $m1 vs $m2"
-            java -cp "lib/*:bin" rts.MicroRTS -f resources/config.properties
-        fi
-    done
-done
-```
+## Hardware Requirements
+
+### Minimum (CPU only)
+- Any modern CPU
+- 16GB RAM
+- Works for Hybrid and Search+LLM agents
+- PureLLM agents will timeout
+
+### Recommended (GPU)
+- NVIDIA GPU with 8GB+ VRAM
+- 16GB+ system RAM
+- Required for PureLLM agents
+- Improves Search+LLM performance
+
+### Model Memory Requirements
+
+| Model | RAM/VRAM Required |
+|-------|-------------------|
+| llama3.2 (3B) | ~2 GB |
+| qwen3:4b | ~2.5 GB |
+| gemma3 (4B) | ~3.3 GB |
+| llama3.1:8b | ~5 GB |
+| deepseek-r1:8b | ~5.2 GB |
+| qwen3:14b | ~9.3 GB |
 
 ---
 
@@ -318,10 +376,7 @@ To benchmark a new LLM provider:
 3. Handle API calls and JSON parsing
 4. Reference in config: `AI1=ai.abstraction.NewLLM`
 
-See existing implementations for examples:
-- `ollama.java` - Local Ollama API
-- `LLM_Gemini.java` - Google Gemini API
-- `mistral.java` - Mistral API
+Or use `openai_proxy.py` to proxy any OpenAI-compatible API through the existing Ollama agent classes without writing Java code.
 
 ---
 
@@ -329,18 +384,21 @@ See existing implementations for examples:
 
 For reproducible benchmarks:
 
-1. **Fixed seeds** - Use deterministic game settings
-2. **Document configuration** - Record model, map, opponent, max_cycles
-3. **Multiple runs** - Run each configuration multiple times
-4. **Hardware notes** - Document GPU model and driver version
+1. **Document configuration** - Record model, agent type, map, opponent, max_cycles
+2. **Multiple runs** - Use `--games 3` or higher for more reliable results
+3. **Hardware notes** - Document GPU model or note CPU-only
+4. **Version tracking** - Results include arena version (v1.0/v2.0) for comparability
 
-Example benchmark metadata:
-```
-Date: 2026-02-01
-Model: llama3.1:8b via Ollama 0.1.x
-GPU: NVIDIA RTX A6000
-Map: maps/8x8/basesWorkers8x8.xml
-Opponent: RandomBiasedAI
-Games: 10
-Max Cycles: 5000
-```
+All benchmark results are stored in `benchmark_results/` as JSON with full configuration metadata.
+
+---
+
+## Files Reference
+
+| File | Purpose |
+|------|---------|
+| `benchmark_arena.py` | Main benchmark runner (v2.0, single-elimination) |
+| `generate_leaderboard.py` | Consolidates results across runs, best-score-per-model |
+| `openai_proxy.py` | Ollama-to-cloud API proxy (DeepSeek, OpenAI, OpenRouter) |
+| `run_phase1_benchmarks.py` | Batch runner for local models (Hybrid + Search+LLM) |
+| `benchmark_results/` | JSON results, RESULTS.md, LEADERBOARD.md, leaderboard.json |
