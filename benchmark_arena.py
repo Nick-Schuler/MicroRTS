@@ -74,27 +74,54 @@ ANCHORS = {
 }
 
 # LLM contestants
-LLMS = {
+# Each entry: class -> {display name, agent type, env overrides}
+# Agent types: PureLLM (every tick), Hybrid (rule-based + periodic LLM),
+#              Search+LLM (MCTS with LLM policy priors)
+LLMS = {}
+
+# Gemini - only include if API key is available
+if os.environ.get("GEMINI_API_KEY"):
+    LLMS["ai.abstraction.LLM_Gemini"] = {
+        "name": "gemini",
+        "display": "gemini-2.5-flash (PureLLM)",
+        "agent_type": "PureLLM",
+        "env": {"GEMINI_API_KEY": os.environ.get("GEMINI_API_KEY", "")}
+    }
+
+LLMS.update({
     "ai.abstraction.ollama": {
         "name": "ollama",
         "display": None,
+        "agent_type": "PureLLM",
         "env": {"OLLAMA_MODEL": os.environ.get("OLLAMA_MODEL", "llama3.1:8b")}
     },
     "ai.abstraction.ollama2": {
         "name": "ollama2",
         "display": None,
+        "agent_type": "PureLLM",
         "env": {"OLLAMA_MODEL_P2": os.environ.get("OLLAMA_MODEL_P2", "qwen3:4b")}
     },
-    "ai.abstraction.LLM_Gemini": {
-        "name": "gemini",
-        "display": "gemini-2.5-flash",
-        "env": {"GEMINI_API_KEY": os.environ.get("GEMINI_API_KEY", "")}
+    "ai.abstraction.HybridLLMRush": {
+        "name": "hybrid",
+        "display": None,
+        "agent_type": "Hybrid",
+        "env": {"OLLAMA_MODEL": os.environ.get("OLLAMA_MODEL", "llama3.1:8b")}
     },
-}
+    "ai.mcts.llmguided.LLMInformedMCTS": {
+        "name": "mcts",
+        "display": None,
+        "agent_type": "Search+LLM",
+        "env": {"OLLAMA_MODEL": os.environ.get("OLLAMA_MODEL", "llama3.1:8b")}
+    },
+})
 
-# Set display names from env
-LLMS["ai.abstraction.ollama"]["display"] = os.environ.get("OLLAMA_MODEL", "llama3.1:8b")
-LLMS["ai.abstraction.ollama2"]["display"] = os.environ.get("OLLAMA_MODEL_P2", "qwen3:4b")
+# Set display names from env (model + agent type)
+_ollama_model = os.environ.get("OLLAMA_MODEL", "llama3.1:8b")
+_ollama_model_p2 = os.environ.get("OLLAMA_MODEL_P2", "qwen3:4b")
+LLMS["ai.abstraction.ollama"]["display"] = f"{_ollama_model} (PureLLM)"
+LLMS["ai.abstraction.ollama2"]["display"] = f"{_ollama_model_p2} (PureLLM)"
+LLMS["ai.abstraction.HybridLLMRush"]["display"] = f"{_ollama_model} (Hybrid)"
+LLMS["ai.mcts.llmguided.LLMInformedMCTS"]["display"] = f"{_ollama_model} (Search+LLM)"
 
 
 def update_config(ai1, ai2):
@@ -604,9 +631,13 @@ def run_tournament(games_per_pair=1):
     else:
         leaderboard = {"entries": []}
 
+    # Build agent_type lookup by display name
+    agent_types = {info["display"]: info["agent_type"] for info in LLMS.values()}
+
     for llm_name, score in benchmark_scores.items():
         leaderboard["entries"].append({
             "model": llm_name,
+            "agent_type": agent_types.get(llm_name, "unknown"),
             "score": score,
             "version": "2.0",
             "date": now.isoformat(),
