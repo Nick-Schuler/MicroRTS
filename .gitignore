@@ -16,3 +16,7 @@ sources.list
 /logs/
 /traces/
 !/examples/traces/
+
+# Python
+__pycache__/
+*.pyc
