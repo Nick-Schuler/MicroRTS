@@ -285,31 +285,80 @@ LLMs face opponents in order of difficulty. They must **win** to advance. A draw
 
 ---
 
-## LLM Agent Types
+## LLM Agent Inventory
 
-Three architectures are available for LLM integration, each with different tradeoffs:
+There are **8 LLM-based Game AI agents** in the system (plus 2 supporting classes), organized into 3 architectural tiers based on how frequently they call the LLM.
 
-### PureLLM (Not recommended on CPU)
+```
+LLM Call Frequency:
 
-**Classes:** `ai.abstraction.ollama`, `ollama2`, `LLM_Gemini`
+PureLLM (5 agents):    ██████████████████████████████████████  Every 1-50 ticks
+Hybrid (2 agents):     ████████                                Every 100-200 ticks
+Search+LLM (1 agent):  ████                                    Every 300-500 ticks
+```
 
-The LLM is called every game tick to decide all unit actions. This requires sub-second inference to be competitive, which is only feasible with a fast GPU or low-latency cloud API.
+### Tier 1: PureLLM Agents (5) -- LLM every tick
 
-### Hybrid
+These call the LLM on every game tick to directly decide all unit actions. All send full game state (map, units, resources, turn) and expect JSON with `{"thinking": "...", "moves": [...]}`. Each move specifies unit position, type, and one of 6 actions: move, harvest, train, build, attack, idle.
 
-**Class:** `ai.abstraction.HybridLLMRush`
+| Agent | File | Backend | Frequency | Notes |
+|-------|------|---------|-----------|-------|
+| **ollama** | `src/ai/abstraction/ollama.java` | Ollama | Every tick | Primary agent; uses `OLLAMA_MODEL` env var |
+| **ollama2** | `src/ai/abstraction/ollama2.java` | Ollama | Every tick | For Player 2 in LLM-vs-LLM; uses `OLLAMA_MODEL_P2` |
+| **LLM_Gemini** | `src/ai/abstraction/LLM_Gemini.java` | Google Gemini API | Every tick | Hardcoded `gemini-2.5-flash`; logs token metrics to CSV |
+| **mistral** | `src/ai/abstraction/mistral.java` | Ollama | Every tick | Aggressive prompt style ("attack ASAP, all in") |
+| **LLM_DeepseekR1** | `src/ai/abstraction/LLM_DeepseekR1.java` | Ollama via sbatch | Every 50 ticks | HPC-oriented; runs LLM calls via job scheduler |
 
-Rule-based strategy execution with periodic LLM consultation (~every 200 ticks). The LLM picks a high-level strategy (WORKER_RUSH, LIGHT_RUSH, HEAVY_RUSH, RANGED_RUSH) and the agent executes it autonomously until the next consultation.
+PureLLM agents require sub-second inference to be competitive, which is only feasible with a fast GPU or low-latency cloud API. On CPU, all PureLLM agents scored 0-5 pts in benchmarks.
 
-Best for small models (4-8B) where fast execution outweighs strategic depth.
+### Tier 2: Hybrid Agents (2) -- LLM every 100-200 ticks
 
-### Search+LLM
+Rule-based strategy execution with periodic LLM consultation. The LLM picks the high-level strategy; proven rule-based AIs execute it.
 
-**Class:** `ai.mcts.llmguided.LLMInformedMCTS`
+| Agent | File | Frequency | Strategies |
+|-------|------|-----------|------------|
+| **HybridLLMRush** | `src/ai/abstraction/HybridLLMRush.java` | Every 200 ticks | 4: WORKER_RUSH, LIGHT_RUSH, HEAVY_RUSH, RANGED_RUSH |
+| **StrategicLLMAgent** | `src/ai/abstraction/StrategicLLMAgent.java` | Every 200 ticks (100 in combat) | 8: above 4 + TURTLE, BOOM, COUNTER_ATTACK, HARASS |
 
-Monte Carlo Tree Search biased by LLM policy priors (cached ~300 ticks) and strategic goal evaluation (cached ~500 ticks). The LLM provides high-level direction while MCTS handles tactical decisions through lookahead search.
+**HybridLLMRush** asks the LLM "which rush strategy?" given unit/building counts for both players, then delegates execution to the corresponding hard-coded rush AI (WorkerRush, LightRush, HeavyRush, or RangedRush).
 
-Best for capable models (14B+) that can provide good strategic priors.
+**StrategicLLMAgent** extends this with 4 additional strategies (defensive/economic) and also asks the LLM for tactical parameters:
+- `aggression` (0.0-1.0): passive to all-in
+- `economy_priority` (0.0-1.0): military focus to economy focus
+- `retreat_threshold` (0.0-1.0): when to retreat based on relative strength
+- `primary_target` (BASE, WORKERS, or ARMY): what to prioritize attacking
+
+Best for small models (4-8B) where fast execution outweighs strategic depth. Scored up to 69 pts (C) in benchmarks.
+
+### Tier 3: Search+LLM Agent (1) -- LLM every 300-500 ticks
+
+| Agent | File | Frequency | Role |
+|-------|------|-----------|------|
+| **LLMInformedMCTS** | `src/ai/mcts/llmguided/LLMInformedMCTS.java` | ~2-3 calls per 500 ticks | AlphaGo-style MCTS with LLM policy priors and strategic goals |
+
+Uses Monte Carlo Tree Search biased by LLM guidance at two levels:
+
+1. **Policy priors** (via `LLMPolicyProbabilityDistribution`, cached ~300 ticks): The LLM provides action probability distributions for 8 unit situation types:
+   - WORKER_NEAR_RESOURCE, WORKER_NO_RESOURCE, WORKER_CARRYING
+   - MILITARY_COMBAT, MILITARY_NO_COMBAT
+   - BASE_ECONOMY, BASE_LOW_RESOURCES, BARRACKS
+
+2. **Strategic goals** (via `LLMStrategicEvaluation`, cached ~500 ticks): The LLM selects primary/secondary goals from: BUILD_ARMY, EXPAND_ECONOMY, ATTACK_BASE, ATTACK_WORKERS, DEFEND, CONTROL_RESOURCES. These bias the MCTS evaluation function.
+
+Best for capable models (14B+) that can provide good strategic priors. Scored up to 119 pts (A+) with qwen3:14b -- the highest score in all benchmarks.
+
+### Summary Table
+
+| Agent | Tier | LLM Backend | Call Frequency | Strategies | Benchmark Best |
+|-------|------|-------------|----------------|------------|---------------|
+| ollama | PureLLM | Ollama | Every tick | Direct actions | 0 pts (F) |
+| ollama2 | PureLLM | Ollama | Every tick | Direct actions | 0 pts (F) |
+| LLM_Gemini | PureLLM | Gemini API | Every tick | Direct actions | 5 pts (F) |
+| mistral | PureLLM | Ollama | Every tick | Direct actions (aggressive) | Not benchmarked |
+| LLM_DeepseekR1 | PureLLM | Ollama/sbatch | Every 50 ticks | Direct actions | Not benchmarked |
+| HybridLLMRush | Hybrid | Ollama | Every 200 ticks | 4 rush strategies | 69 pts (C) |
+| StrategicLLMAgent | Hybrid | Ollama | Every 100-200 ticks | 8 strategies + tactics | Not benchmarked |
+| LLMInformedMCTS | Search+LLM | Ollama | ~2-3 per 500 ticks | MCTS + policy priors + goals | 119 pts (A+) |
 
 ---
 
@@ -333,10 +382,12 @@ export OLLAMA_MODEL_P2="qwen3:4b"      # Player 1
 |-------|----------------------|-------------|
 | `ai.abstraction.ollama` | `OLLAMA_MODEL`, `OLLAMA_HOST` | Primary Ollama agent (PureLLM) |
 | `ai.abstraction.ollama2` | `OLLAMA_MODEL_P2`, `OLLAMA_HOST` | Second Ollama agent (PureLLM) |
-| `ai.abstraction.HybridLLMRush` | `OLLAMA_MODEL`, `OLLAMA_HOST` | Hybrid strategy agent |
-| `ai.abstraction.StrategicLLMAgent` | `OLLAMA_MODEL`, `OLLAMA_HOST` | Enhanced 8-strategy agent |
-| `ai.mcts.llmguided.LLMInformedMCTS` | `OLLAMA_MODEL`, `OLLAMA_HOST` | MCTS with LLM priors |
 | `ai.abstraction.LLM_Gemini` | `GEMINI_API_KEY` | Google Gemini API (PureLLM) |
+| `ai.abstraction.mistral` | `OLLAMA_MODEL`, `OLLAMA_HOST` | Mistral via Ollama (PureLLM) |
+| `ai.abstraction.LLM_DeepseekR1` | `OLLAMA_HOST` | DeepSeek-R1 via sbatch (PureLLM) |
+| `ai.abstraction.HybridLLMRush` | `OLLAMA_MODEL`, `OLLAMA_HOST` | Hybrid 4-strategy agent |
+| `ai.abstraction.StrategicLLMAgent` | `OLLAMA_MODEL`, `OLLAMA_HOST` | Hybrid 8-strategy + tactics agent |
+| `ai.mcts.llmguided.LLMInformedMCTS` | `OLLAMA_MODEL`, `OLLAMA_HOST` | MCTS with LLM priors (Search+LLM) |
 
 ---
 
