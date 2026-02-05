@@ -2,24 +2,44 @@
 
 Best benchmark score per model across all runs.
 
-*Generated: 2026-02-04 17:17*
+*Generated: 2026-02-04 18:08*
 
 ## Rankings
 
-| Rank | Model | Score | Grade | Eliminated at | RandomBiasedAI | HeavyRush | LightRush | WorkerRush | Tiamat |
-|------|-------|-------|-------|---------------|------|------|------|------|------|
-| 1 | llama3.1:8b (Search+LLM) | **69.0** | C | Tiamat | 1W/0D/0L | 1W/0D/0L | 1W/0D/0L | 1W/0D/0L | 0W/0D/1L |
-| 2 | llama3.1:8b (Hybrid) | **54.0** | D | WorkerRush | 1W/0D/0L | 1W/0D/0L | 1W/0D/0L | 0W/0D/1L | -- |
-| 3 | gemini-2.5-flash | **50.0** | D | cleared all | 0W/1D/0L | - | - | 0W/1D/0L | - |
-| 4 | gemini-2.5-flash (PureLLM) | **5.0** | F | RandomBiasedAI | 0W/1D/0L | -- | -- | -- | -- |
-| 5 | llama3.1:8b | **0.0** | F | cleared all | 0W/0D/1L | - | - | 0W/0D/1L | - |
-| 6 | qwen3:4b | **0.0** | F | cleared all | 0W/0D/1L | - | - | 0W/0D/1L | - |
-| 7 | llama3.1:8b (PureLLM) | **0.0** | F | RandomBiasedAI | 0W/0D/1L | -- | -- | -- | -- |
-| 8 | qwen3:4b (PureLLM) | **0.0** | F | RandomBiasedAI | 0W/0D/1L | -- | -- | -- | -- |
+| Rank | Model | Score | Grade | Eliminated at | RandomBiasedAI | HeavyRush | LightRush | WorkerRush | Tiamat | CoacAI |
+|------|-------|-------|-------|---------------|------|------|------|------|------|------|
+| 1 | qwen3:14b (Search+LLM) | **119.0** | A+ | cleared all | 1W/0D/0L | 1W/0D/0L | 1W/0D/0L | 1W/0D/0L | 1W/0D/0L | 1W/0D/0L |
+| 2 | llama3.1:8b (Search+LLM) | **69.0** | C | Tiamat | 1W/0D/0L | 1W/0D/0L | 1W/0D/0L | 1W/0D/0L | 0W/0D/1L | -- |
+| 3 | qwen3:14b (Hybrid) | **69.0** | C | Tiamat | 1W/0D/0L | 1W/0D/0L | 1W/0D/0L | 1W/0D/0L | 0W/0D/1L | -- |
+| 4 | llama3.1:8b (Hybrid) | **54.0** | D | WorkerRush | 1W/0D/0L | 1W/0D/0L | 1W/0D/0L | 0W/0D/1L | -- | -- |
+| 5 | gemini-2.5-flash | **50.0** | D | cleared all | 0W/1D/0L | - | - | 0W/1D/0L | - | - |
+| 6 | gemini-2.5-flash (PureLLM) | **5.0** | F | RandomBiasedAI | 0W/1D/0L | -- | -- | -- | -- | -- |
+| 7 | llama3.1:8b | **0.0** | F | cleared all | 0W/0D/1L | - | - | 0W/0D/1L | - | - |
+| 8 | qwen3:4b | **0.0** | F | cleared all | 0W/0D/1L | - | - | 0W/0D/1L | - | - |
+| 9 | llama3.1:8b (PureLLM) | **0.0** | F | RandomBiasedAI | 0W/0D/1L | -- | -- | -- | -- | -- |
+| 10 | qwen3:4b (PureLLM) | **0.0** | F | RandomBiasedAI | 0W/0D/1L | -- | -- | -- | -- | -- |
 
 ---
 
 ## Detailed Breakdown
+
+### qwen3:14b (Search+LLM) - 119.0 pts (A+ -- cleared all)
+
+- **Date:** 2026-02-04
+- **Arena version:** v2.0
+- **Format:** single-elimination
+- **Map:** `maps/8x8/basesWorkers8x8.xml`
+- **Games per matchup:** 1
+- **Source:** `benchmark_2026-02-04_18-08.json`
+
+| Opponent | W | D | L | Weighted Pts |
+|----------|---|---|---|-------------|
+| RandomBiasedAI | 1 | 0 | 0 | 11.0 |
+| HeavyRush | 1 | 0 | 0 | 24.0 |
+| LightRush | 1 | 0 | 0 | 18.0 |
+| WorkerRush | 1 | 0 | 0 | 18.0 |
+| Tiamat | 1 | 0 | 0 | 24.0 |
+| CoacAI | 1 | 0 | 0 | 24.0 |
 
 ### llama3.1:8b (Search+LLM) - 69.0 pts (C -- eliminated at Tiamat)
 
@@ -29,6 +49,23 @@ Best benchmark score per model across all runs.
 - **Map:** `maps/8x8/basesWorkers8x8.xml`
 - **Games per matchup:** 1
 - **Source:** `benchmark_2026-02-04_17-16.json`
+
+| Opponent | W | D | L | Weighted Pts |
+|----------|---|---|---|-------------|
+| RandomBiasedAI | 1 | 0 | 0 | 12.0 |
+| HeavyRush | 1 | 0 | 0 | 24.0 |
+| LightRush | 1 | 0 | 0 | 18.0 |
+| WorkerRush | 1 | 0 | 0 | 15.0 |
+| Tiamat | 0 | 0 | 1 | 0.0 |
+
+### qwen3:14b (Hybrid) - 69.0 pts (C -- eliminated at Tiamat)
+
+- **Date:** 2026-02-04
+- **Arena version:** v2.0
+- **Format:** single-elimination
+- **Map:** `maps/8x8/basesWorkers8x8.xml`
+- **Games per matchup:** 1
+- **Source:** `benchmark_2026-02-04_18-08.json`
 
 | Opponent | W | D | L | Weighted Pts |
 |----------|---|---|---|-------------|

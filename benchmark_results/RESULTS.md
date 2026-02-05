@@ -36,69 +36,33 @@ Single-elimination: LLMs must **win** to advance. Draw/loss/timeout = eliminated
 
 | Rank | Model | Score | Grade | RandomBiasedAI | HeavyRush | LightRush | WorkerRush | Tiamat | CoacAI |
 |------|-------|-------|-------|------|------|------|------|------|------|
-| 1 | llama3.1:8b (Search+LLM) | **69.0** | C | 1W/0D/0L | 1W/0D/0L | 1W/0D/0L | 1W/0D/0L | 0W/0D/1L | -- |
-| 2 | llama3.1:8b (Hybrid) | **54.0** | D | 1W/0D/0L | 1W/0D/0L | 1W/0D/0L | 0W/0D/1L | -- | -- |
-| 3 | gemini-2.5-flash (PureLLM) | **5.0** | F | 0W/1D/0L | -- | -- | -- | -- | -- |
-| 4 | llama3.1:8b (PureLLM) | **0.0** | F | 0W/0D/1L | -- | -- | -- | -- | -- |
-| 5 | qwen3:4b (PureLLM) | **0.0** | F | 0W/0D/1L | -- | -- | -- | -- | -- |
+| 1 | qwen3:14b (Search+LLM) | **119.0** | A+ | 1W/0D/0L | 1W/0D/0L | 1W/0D/0L | 1W/0D/0L | 1W/0D/0L | 1W/0D/0L |
+| 2 | qwen3:14b (Hybrid) | **69.0** | C | 1W/0D/0L | 1W/0D/0L | 1W/0D/0L | 1W/0D/0L | 0W/0D/1L | -- |
 
 ---
 
 ## Detailed Results
 
-### llama3.1:8b (Search+LLM) (Score: 69.0 -- eliminated at Tiamat)
+### qwen3:14b (Search+LLM) (Score: 119.0 -- cleared all)
 
 | Opponent | Tier | Result | Ticks | Game Score | Weight | Points |
 |----------|------|--------|-------|------------|--------|--------|
-| RandomBiasedAI | easy | WIN | 505 | 1.20 | 10 | 12.0 |
-| HeavyRush | medium-hard | WIN | 265 | 1.20 | 20 | 24.0 |
-| LightRush | medium | WIN | 300 | 1.20 | 15 | 18.0 |
-| WorkerRush | medium | WIN | 1125 | 1.00 | 15 | 15.0 |
-| Tiamat | hard | LOSS | 385 | 0.00 | 20 | 0.0 |
-| CoacAI | hard | -- | -- | -- | 20 | 0.0 |
+| RandomBiasedAI | easy | WIN | 820 | 1.10 | 10 | 11.0 |
+| HeavyRush | medium-hard | WIN | 290 | 1.20 | 20 | 24.0 |
+| LightRush | medium | WIN | 365 | 1.20 | 15 | 18.0 |
+| WorkerRush | medium | WIN | 485 | 1.20 | 15 | 18.0 |
+| Tiamat | hard | WIN | 390 | 1.20 | 20 | 24.0 |
+| CoacAI | hard | WIN | 530 | 1.20 | 20 | 24.0 |
 
-### llama3.1:8b (Hybrid) (Score: 54.0 -- eliminated at WorkerRush)
+### qwen3:14b (Hybrid) (Score: 69.0 -- eliminated at Tiamat)
 
 | Opponent | Tier | Result | Ticks | Game Score | Weight | Points |
 |----------|------|--------|-------|------------|--------|--------|
-| RandomBiasedAI | easy | WIN | 620 | 1.20 | 10 | 12.0 |
+| RandomBiasedAI | easy | WIN | 435 | 1.20 | 10 | 12.0 |
 | HeavyRush | medium-hard | WIN | 195 | 1.20 | 20 | 24.0 |
 | LightRush | medium | WIN | 195 | 1.20 | 15 | 18.0 |
-| WorkerRush | medium | LOSS | 240 | 0.00 | 15 | 0.0 |
-| Tiamat | hard | -- | -- | -- | 20 | 0.0 |
-| CoacAI | hard | -- | -- | -- | 20 | 0.0 |
-
-### gemini-2.5-flash (PureLLM) (Score: 5.0 -- eliminated at RandomBiasedAI)
-
-| Opponent | Tier | Result | Ticks | Game Score | Weight | Points |
-|----------|------|--------|-------|------------|--------|--------|
-| RandomBiasedAI | easy | DRAW | 1500 | 0.50 | 10 | 5.0 |
-| HeavyRush | medium-hard | -- | -- | -- | 20 | 0.0 |
-| LightRush | medium | -- | -- | -- | 15 | 0.0 |
-| WorkerRush | medium | -- | -- | -- | 15 | 0.0 |
-| Tiamat | hard | -- | -- | -- | 20 | 0.0 |
-| CoacAI | hard | -- | -- | -- | 20 | 0.0 |
-
-### llama3.1:8b (PureLLM) (Score: 0.0 -- eliminated at RandomBiasedAI)
-
-| Opponent | Tier | Result | Ticks | Game Score | Weight | Points |
-|----------|------|--------|-------|------------|--------|--------|
-| RandomBiasedAI | easy | TIMEOUT | 1500 | 0.00 | 10 | 0.0 |
-| HeavyRush | medium-hard | -- | -- | -- | 20 | 0.0 |
-| LightRush | medium | -- | -- | -- | 15 | 0.0 |
-| WorkerRush | medium | -- | -- | -- | 15 | 0.0 |
-| Tiamat | hard | -- | -- | -- | 20 | 0.0 |
-| CoacAI | hard | -- | -- | -- | 20 | 0.0 |
-
-### qwen3:4b (PureLLM) (Score: 0.0 -- eliminated at RandomBiasedAI)
-
-| Opponent | Tier | Result | Ticks | Game Score | Weight | Points |
-|----------|------|--------|-------|------------|--------|--------|
-| RandomBiasedAI | easy | TIMEOUT | 1500 | 0.00 | 10 | 0.0 |
-| HeavyRush | medium-hard | -- | -- | -- | 20 | 0.0 |
-| LightRush | medium | -- | -- | -- | 15 | 0.0 |
-| WorkerRush | medium | -- | -- | -- | 15 | 0.0 |
-| Tiamat | hard | -- | -- | -- | 20 | 0.0 |
+| WorkerRush | medium | WIN | 1365 | 1.00 | 15 | 15.0 |
+| Tiamat | hard | LOSS | 1240 | 0.00 | 20 | 0.0 |
 | CoacAI | hard | -- | -- | -- | 20 | 0.0 |
 
 ---
@@ -109,16 +73,7 @@ These games do not affect benchmark scores but show relative performance between
 
 | Player 1 | Player 2 | Result | Ticks |
 |----------|----------|--------|-------|
-| gemini-2.5-flash (PureLLM) | llama3.1:8b (PureLLM) | DRAW | 1500 |
-| gemini-2.5-flash (PureLLM) | qwen3:4b (PureLLM) | DRAW | 1500 |
-| gemini-2.5-flash (PureLLM) | llama3.1:8b (Hybrid) | DRAW | 1500 |
-| gemini-2.5-flash (PureLLM) | llama3.1:8b (Search+LLM) | DRAW | 1500 |
-| llama3.1:8b (PureLLM) | qwen3:4b (PureLLM) | DRAW | 1500 |
-| llama3.1:8b (PureLLM) | llama3.1:8b (Hybrid) | TIMEOUT | 1500 |
-| llama3.1:8b (PureLLM) | llama3.1:8b (Search+LLM) | TIMEOUT | 1500 |
-| qwen3:4b (PureLLM) | llama3.1:8b (Hybrid) | TIMEOUT | 1500 |
-| qwen3:4b (PureLLM) | llama3.1:8b (Search+LLM) | TIMEOUT | 1500 |
-| llama3.1:8b (Hybrid) | llama3.1:8b (Search+LLM) | LOSS | 620 |
+| qwen3:14b (Hybrid) | qwen3:14b (Search+LLM) | LOSS | 515 |
 
 ---
 
