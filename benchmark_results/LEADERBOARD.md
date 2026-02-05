@@ -2,28 +2,30 @@
 
 Best benchmark score per model across all runs.
 
-*Generated: 2026-02-05 04:58*
+*Generated: 2026-02-05 09:04*
 
 ## Rankings
 
 | Rank | Model | Score | Grade | Eliminated at | RandomBiasedAI | HeavyRush | LightRush | WorkerRush | Tiamat | CoacAI |
 |------|-------|-------|-------|---------------|------|------|------|------|------|------|
 | 1 | qwen3:14b (Search+LLM) | **119.0** | A+ | cleared all | 1W/0D/0L | 1W/0D/0L | 1W/0D/0L | 1W/0D/0L | 1W/0D/0L | 1W/0D/0L |
-| 2 | llama3.1:8b (Search+LLM) | **69.0** | C | Tiamat | 1W/0D/0L | 1W/0D/0L | 1W/0D/0L | 1W/0D/0L | 0W/0D/1L | -- |
-| 3 | qwen3:14b (Hybrid) | **69.0** | C | Tiamat | 1W/0D/0L | 1W/0D/0L | 1W/0D/0L | 1W/0D/0L | 0W/0D/1L | -- |
-| 4 | gemma3 (Hybrid) | **69.0** | C | Tiamat | 1W/0D/0L | 1W/0D/0L | 1W/0D/0L | 1W/0D/0L | 0W/0D/1L | -- |
-| 5 | llama3.1:8b (Hybrid) | **54.0** | D | WorkerRush | 1W/0D/0L | 1W/0D/0L | 1W/0D/0L | 0W/0D/1L | -- | -- |
-| 6 | deepseek-r1:8b (Hybrid) | **54.0** | D | WorkerRush | 1W/0D/0L | 1W/0D/0L | 1W/0D/0L | 0W/0D/1L | -- | -- |
-| 7 | deepseek-r1:8b (Search+LLM) | **54.0** | D | WorkerRush | 1W/0D/0L | 1W/0D/0L | 1W/0D/0L | 0W/0D/1L | -- | -- |
-| 8 | gemma3 (Search+LLM) | **54.0** | D | WorkerRush | 1W/0D/0L | 1W/0D/0L | 1W/0D/0L | 0W/0D/1L | -- | -- |
-| 9 | llama3.2 (Hybrid) | **54.0** | D | WorkerRush | 1W/0D/0L | 1W/0D/0L | 1W/0D/0L | 0W/0D/1L | -- | -- |
-| 10 | gemini-2.5-flash | **50.0** | D | cleared all | 0W/1D/0L | - | - | 0W/1D/0L | - | - |
-| 11 | llama3.2 (Search+LLM) | **36.0** | F | LightRush | 1W/0D/0L | 1W/0D/0L | 0W/0D/1L | -- | -- | -- |
-| 12 | gemini-2.5-flash (PureLLM) | **5.0** | F | RandomBiasedAI | 0W/1D/0L | -- | -- | -- | -- | -- |
-| 13 | llama3.1:8b | **0.0** | F | cleared all | 0W/0D/1L | - | - | 0W/0D/1L | - | - |
-| 14 | qwen3:4b | **0.0** | F | cleared all | 0W/0D/1L | - | - | 0W/0D/1L | - | - |
-| 15 | llama3.1:8b (PureLLM) | **0.0** | F | RandomBiasedAI | 0W/0D/1L | -- | -- | -- | -- | -- |
-| 16 | qwen3:4b (PureLLM) | **0.0** | F | RandomBiasedAI | 0W/0D/1L | -- | -- | -- | -- | -- |
+| 2 | deepseek-chat (Search+LLM) | **96.0** | A+ | CoacAI | 1W/0D/0L | 1W/0D/0L | 1W/0D/0L | 1W/0D/0L | 1W/0D/0L | 0W/0D/1L |
+| 3 | llama3.1:8b (Search+LLM) | **69.0** | C | Tiamat | 1W/0D/0L | 1W/0D/0L | 1W/0D/0L | 1W/0D/0L | 0W/0D/1L | -- |
+| 4 | qwen3:14b (Hybrid) | **69.0** | C | Tiamat | 1W/0D/0L | 1W/0D/0L | 1W/0D/0L | 1W/0D/0L | 0W/0D/1L | -- |
+| 5 | gemma3 (Hybrid) | **69.0** | C | Tiamat | 1W/0D/0L | 1W/0D/0L | 1W/0D/0L | 1W/0D/0L | 0W/0D/1L | -- |
+| 6 | llama3.1:8b (Hybrid) | **54.0** | D | WorkerRush | 1W/0D/0L | 1W/0D/0L | 1W/0D/0L | 0W/0D/1L | -- | -- |
+| 7 | deepseek-r1:8b (Hybrid) | **54.0** | D | WorkerRush | 1W/0D/0L | 1W/0D/0L | 1W/0D/0L | 0W/0D/1L | -- | -- |
+| 8 | deepseek-r1:8b (Search+LLM) | **54.0** | D | WorkerRush | 1W/0D/0L | 1W/0D/0L | 1W/0D/0L | 0W/0D/1L | -- | -- |
+| 9 | gemma3 (Search+LLM) | **54.0** | D | WorkerRush | 1W/0D/0L | 1W/0D/0L | 1W/0D/0L | 0W/0D/1L | -- | -- |
+| 10 | llama3.2 (Hybrid) | **54.0** | D | WorkerRush | 1W/0D/0L | 1W/0D/0L | 1W/0D/0L | 0W/0D/1L | -- | -- |
+| 11 | deepseek-chat (Hybrid) | **54.0** | D | WorkerRush | 1W/0D/0L | 1W/0D/0L | 1W/0D/0L | 0W/0D/1L | -- | -- |
+| 12 | gemini-2.5-flash | **50.0** | D | cleared all | 0W/1D/0L | - | - | 0W/1D/0L | - | - |
+| 13 | llama3.2 (Search+LLM) | **36.0** | F | LightRush | 1W/0D/0L | 1W/0D/0L | 0W/0D/1L | -- | -- | -- |
+| 14 | gemini-2.5-flash (PureLLM) | **5.0** | F | RandomBiasedAI | 0W/1D/0L | -- | -- | -- | -- | -- |
+| 15 | llama3.1:8b | **0.0** | F | cleared all | 0W/0D/1L | - | - | 0W/0D/1L | - | - |
+| 16 | qwen3:4b | **0.0** | F | cleared all | 0W/0D/1L | - | - | 0W/0D/1L | - | - |
+| 17 | llama3.1:8b (PureLLM) | **0.0** | F | RandomBiasedAI | 0W/0D/1L | -- | -- | -- | -- | -- |
+| 18 | qwen3:4b (PureLLM) | **0.0** | F | RandomBiasedAI | 0W/0D/1L | -- | -- | -- | -- | -- |
 
 ---
 
@@ -46,6 +48,24 @@ Best benchmark score per model across all runs.
 | WorkerRush | 1 | 0 | 0 | 18.0 |
 | Tiamat | 1 | 0 | 0 | 24.0 |
 | CoacAI | 1 | 0 | 0 | 24.0 |
+
+### deepseek-chat (Search+LLM) - 96.0 pts (A+ -- eliminated at CoacAI)
+
+- **Date:** 2026-02-05
+- **Arena version:** v2.0
+- **Format:** single-elimination
+- **Map:** `maps/8x8/basesWorkers8x8.xml`
+- **Games per matchup:** 1
+- **Source:** `benchmark_2026-02-05_09-04.json`
+
+| Opponent | W | D | L | Weighted Pts |
+|----------|---|---|---|-------------|
+| RandomBiasedAI | 1 | 0 | 0 | 12.0 |
+| HeavyRush | 1 | 0 | 0 | 24.0 |
+| LightRush | 1 | 0 | 0 | 18.0 |
+| WorkerRush | 1 | 0 | 0 | 18.0 |
+| Tiamat | 1 | 0 | 0 | 24.0 |
+| CoacAI | 0 | 0 | 1 | 0.0 |
 
 ### llama3.1:8b (Search+LLM) - 69.0 pts (C -- eliminated at Tiamat)
 
@@ -170,6 +190,22 @@ Best benchmark score per model across all runs.
 - **Map:** `maps/8x8/basesWorkers8x8.xml`
 - **Games per matchup:** 1
 - **Source:** `benchmark_2026-02-05_04-58.json`
+
+| Opponent | W | D | L | Weighted Pts |
+|----------|---|---|---|-------------|
+| RandomBiasedAI | 1 | 0 | 0 | 12.0 |
+| HeavyRush | 1 | 0 | 0 | 24.0 |
+| LightRush | 1 | 0 | 0 | 18.0 |
+| WorkerRush | 0 | 0 | 1 | 0.0 |
+
+### deepseek-chat (Hybrid) - 54.0 pts (D -- eliminated at WorkerRush)
+
+- **Date:** 2026-02-05
+- **Arena version:** v2.0
+- **Format:** single-elimination
+- **Map:** `maps/8x8/basesWorkers8x8.xml`
+- **Games per matchup:** 1
+- **Source:** `benchmark_2026-02-05_09-04.json`
 
 | Opponent | W | D | L | Weighted Pts |
 |----------|---|---|---|-------------|

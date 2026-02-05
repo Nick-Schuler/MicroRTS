@@ -36,32 +36,32 @@ Single-elimination: LLMs must **win** to advance. Draw/loss/timeout = eliminated
 
 | Rank | Model | Score | Grade | RandomBiasedAI | HeavyRush | LightRush | WorkerRush | Tiamat | CoacAI |
 |------|-------|-------|-------|------|------|------|------|------|------|
-| 1 | llama3.2 (Hybrid) | **54.0** | D | 1W/0D/0L | 1W/0D/0L | 1W/0D/0L | 0W/0D/1L | -- | -- |
-| 2 | llama3.2 (Search+LLM) | **36.0** | F | 1W/0D/0L | 1W/0D/0L | 0W/0D/1L | -- | -- | -- |
+| 1 | deepseek-chat (Search+LLM) | **96.0** | A+ | 1W/0D/0L | 1W/0D/0L | 1W/0D/0L | 1W/0D/0L | 1W/0D/0L | 0W/0D/1L |
+| 2 | deepseek-chat (Hybrid) | **54.0** | D | 1W/0D/0L | 1W/0D/0L | 1W/0D/0L | 0W/0D/1L | -- | -- |
 
 ---
 
 ## Detailed Results
 
-### llama3.2 (Hybrid) (Score: 54.0 -- eliminated at WorkerRush)
+### deepseek-chat (Search+LLM) (Score: 96.0 -- eliminated at CoacAI)
 
 | Opponent | Tier | Result | Ticks | Game Score | Weight | Points |
 |----------|------|--------|-------|------------|--------|--------|
-| RandomBiasedAI | easy | WIN | 460 | 1.20 | 10 | 12.0 |
-| HeavyRush | medium-hard | WIN | 400 | 1.20 | 20 | 24.0 |
+| RandomBiasedAI | easy | WIN | 435 | 1.20 | 10 | 12.0 |
+| HeavyRush | medium-hard | WIN | 235 | 1.20 | 20 | 24.0 |
+| LightRush | medium | WIN | 285 | 1.20 | 15 | 18.0 |
+| WorkerRush | medium | WIN | 630 | 1.20 | 15 | 18.0 |
+| Tiamat | hard | WIN | 475 | 1.20 | 20 | 24.0 |
+| CoacAI | hard | LOSS | 476 | 0.00 | 20 | 0.0 |
+
+### deepseek-chat (Hybrid) (Score: 54.0 -- eliminated at WorkerRush)
+
+| Opponent | Tier | Result | Ticks | Game Score | Weight | Points |
+|----------|------|--------|-------|------------|--------|--------|
+| RandomBiasedAI | easy | WIN | 370 | 1.20 | 10 | 12.0 |
+| HeavyRush | medium-hard | WIN | 195 | 1.20 | 20 | 24.0 |
 | LightRush | medium | WIN | 195 | 1.20 | 15 | 18.0 |
-| WorkerRush | medium | LOSS | 330 | 0.00 | 15 | 0.0 |
-| Tiamat | hard | -- | -- | -- | 20 | 0.0 |
-| CoacAI | hard | -- | -- | -- | 20 | 0.0 |
-
-### llama3.2 (Search+LLM) (Score: 36.0 -- eliminated at LightRush)
-
-| Opponent | Tier | Result | Ticks | Game Score | Weight | Points |
-|----------|------|--------|-------|------------|--------|--------|
-| RandomBiasedAI | easy | WIN | 485 | 1.20 | 10 | 12.0 |
-| HeavyRush | medium-hard | WIN | 305 | 1.20 | 20 | 24.0 |
-| LightRush | medium | LOSS | 1095 | 0.00 | 15 | 0.0 |
-| WorkerRush | medium | -- | -- | -- | 15 | 0.0 |
+| WorkerRush | medium | LOSS | 1180 | 0.00 | 15 | 0.0 |
 | Tiamat | hard | -- | -- | -- | 20 | 0.0 |
 | CoacAI | hard | -- | -- | -- | 20 | 0.0 |
 
@@ -73,7 +73,7 @@ These games do not affect benchmark scores but show relative performance between
 
 | Player 1 | Player 2 | Result | Ticks |
 |----------|----------|--------|-------|
-| llama3.2 (Hybrid) | llama3.2 (Search+LLM) | LOSS | 390 |
+| deepseek-chat (Hybrid) | deepseek-chat (Search+LLM) | LOSS | 845 |
 
 ---
 

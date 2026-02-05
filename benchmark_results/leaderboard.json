@@ -1,5 +1,5 @@
 {
-  "generated": "2026-02-05T04:58:28.821928",
+  "generated": "2026-02-05T09:04:57.210927",
   "description": "Best benchmark score per model across all runs",
   "entries": [
     {
@@ -57,6 +57,62 @@
         }
       },
       "source_file": "benchmark_2026-02-04_18-08.json"
+    },
+    {
+      "model": "deepseek-chat (Search+LLM)",
+      "score": 96.0,
+      "grade": "A+",
+      "version": "2.0",
+      "format": "single-elimination",
+      "eliminated_at": "CoacAI",
+      "date": "2026-02-05T09:04:51.214984",
+      "map": "maps/8x8/basesWorkers8x8.xml",
+      "games_per_matchup": 1,
+      "opponents": {
+        "RandomBiasedAI": {
+          "wins": 1,
+          "draws": 0,
+          "losses": 0,
+          "avg_game_score": 1.2,
+          "weighted_points": 12.0
+        },
+        "HeavyRush": {
+          "wins": 1,
+          "draws": 0,
+          "losses": 0,
+          "avg_game_score": 1.2,
+          "weighted_points": 24.0
+        },
+        "LightRush": {
+          "wins": 1,
+          "draws": 0,
+          "losses": 0,
+          "avg_game_score": 1.2,
+          "weighted_points": 18.0
+        },
+        "WorkerRush": {
+          "wins": 1,
+          "draws": 0,
+          "losses": 0,
+          "avg_game_score": 1.2,
+          "weighted_points": 18.0
+        },
+        "Tiamat": {
+          "wins": 1,
+          "draws": 0,
+          "losses": 0,
+          "avg_game_score": 1.2,
+          "weighted_points": 24.0
+        },
+        "CoacAI": {
+          "wins": 0,
+          "draws": 0,
+          "losses": 1,
+          "avg_game_score": 0.0,
+          "weighted_points": 0.0
+        }
+      },
+      "source_file": "benchmark_2026-02-05_09-04.json"
     },
     {
       "model": "llama3.1:8b (Search+LLM)",
@@ -414,6 +470,48 @@
         }
       },
       "source_file": "benchmark_2026-02-05_04-58.json"
+    },
+    {
+      "model": "deepseek-chat (Hybrid)",
+      "score": 54.0,
+      "grade": "D",
+      "version": "2.0",
+      "format": "single-elimination",
+      "eliminated_at": "WorkerRush",
+      "date": "2026-02-05T09:04:51.214984",
+      "map": "maps/8x8/basesWorkers8x8.xml",
+      "games_per_matchup": 1,
+      "opponents": {
+        "RandomBiasedAI": {
+          "wins": 1,
+          "draws": 0,
+          "losses": 0,
+          "avg_game_score": 1.2,
+          "weighted_points": 12.0
+        },
+        "HeavyRush": {
+          "wins": 1,
+          "draws": 0,
+          "losses": 0,
+          "avg_game_score": 1.2,
+          "weighted_points": 24.0
+        },
+        "LightRush": {
+          "wins": 1,
+          "draws": 0,
+          "losses": 0,
+          "avg_game_score": 1.2,
+          "weighted_points": 18.0
+        },
+        "WorkerRush": {
+          "wins": 0,
+          "draws": 0,
+          "losses": 1,
+          "avg_game_score": 0.0,
+          "weighted_points": 0.0
+        }
+      },
+      "source_file": "benchmark_2026-02-05_09-04.json"
     },
     {
       "model": "gemini-2.5-flash",
