@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MicroRTS LLM Competition</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <h1>MicroRTS LLM Competition</h1>
+            <p class="subtitle">IEEE WCCI 2026 &mdash; Can LLMs Play Real-Time Strategy?</p>
+            <nav>
+                <a href="#leaderboard" class="tab active" data-tab="leaderboard">Leaderboard</a>
+                <a href="#benchmarks" class="tab" data-tab="benchmarks">Benchmarks</a>
+                <a href="#h2h" class="tab" data-tab="h2h">Head-to-Head</a>
+                <a href="#history" class="tab" data-tab="history">History</a>
+                <span class="nav-sep">|</span>
+                <a href="submit.html">Submit Agent</a>
+                <a href="rules.html">Rules</a>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <!-- Leaderboard Tab -->
+        <section id="leaderboard" class="tab-content active">
+            <h2>Leaderboard</h2>
+            <p class="section-desc">
+                Best score per model/team. Single-elimination against 6 reference AIs (0-100 scale).
+            </p>
+            <div class="table-container">
+                <table id="leaderboard-table">
+                    <thead>
+                        <tr>
+                            <th>Rank</th>
+                            <th>Name</th>
+                            <th>Score</th>
+                            <th>Grade</th>
+                            <th>RandomBiased</th>
+                            <th>HeavyRush</th>
+                            <th>LightRush</th>
+                            <th>WorkerRush</th>
+                            <th>Tiamat</th>
+                            <th>CoacAI</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Benchmarks Tab -->
+        <section id="benchmarks" class="tab-content">
+            <h2>Benchmark Scores</h2>
+            <p class="section-desc">
+                All recorded benchmark runs, showing score progression over time.
+            </p>
+            <div class="table-container">
+                <table id="benchmarks-table">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Score</th>
+                            <th>Grade</th>
+                            <th>Source</th>
+                            <th>Date</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Head-to-Head Tab -->
+        <section id="h2h" class="tab-content">
+            <h2>Head-to-Head Matrix</h2>
+            <p class="section-desc">
+                Direct matchup results between agents (supplementary, does not affect benchmark scores).
+            </p>
+            <div class="table-container">
+                <table id="h2h-table">
+                    <thead></thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+            <p id="h2h-empty" class="empty-msg" style="display:none;">
+                No head-to-head data available yet.
+            </p>
+        </section>
+
+        <!-- History Tab -->
+        <section id="history" class="tab-content">
+            <h2>Tournament History</h2>
+            <p class="section-desc">
+                Chronological record of all benchmark and tournament runs.
+            </p>
+            <div class="table-container">
+                <table id="history-table">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Name</th>
+                            <th>Score</th>
+                            <th>Grade</th>
+                            <th>Source</th>
+                            <th>Map</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="footer-content">
+            <p>
+                <a href="https://github.com/santiontanon/microrts">MicroRTS</a> &mdash;
+                IEEE WCCI 2026 LLM Game AI Competition
+            </p>
+            <p class="generated-at" id="generated-at"></p>
+        </div>
+    </footer>
+
+    <script src="app.js"></script>
+</body>
+</html>

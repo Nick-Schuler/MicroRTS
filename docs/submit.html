@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Submit Agent - MicroRTS LLM Competition</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <h1>MicroRTS LLM Competition</h1>
+            <p class="subtitle">IEEE WCCI 2026 &mdash; Agent Submission Guide</p>
+            <nav>
+                <a href="index.html">Leaderboard</a>
+                <a href="submit.html" class="tab active">Submit Agent</a>
+                <a href="rules.html">Rules</a>
+            </nav>
+        </div>
+    </header>
+
+    <div class="page-content">
+        <a href="index.html" class="back-link">&larr; Back to Leaderboard</a>
+
+        <h1>How to Submit Your Agent</h1>
+
+        <h2>Step 1: Fork the Repository</h2>
+        <p>Fork the <a href="https://github.com/santiontanon/microrts" style="color: var(--accent)">MicroRTS repository</a> to your GitHub account.</p>
+
+        <h2>Step 2: Create Your Team Folder</h2>
+        <p>Copy the submission template:</p>
+        <pre><code>cp -r submissions/_template submissions/your-team-name</code></pre>
+        <p>Use a URL-safe team name: lowercase letters, numbers, and hyphens only.</p>
+
+        <h2>Step 3: Edit metadata.json</h2>
+        <p>Fill in your team information:</p>
+        <pre><code>{
+  "team_name": "your-team-name",
+  "display_name": "Your Team Name",
+  "agent_class": "YourAgent",
+  "agent_file": "YourAgent.java",
+  "model_provider": "ollama",
+  "model_name": "llama3.1:8b",
+  "description": "Brief strategy description"
+}</code></pre>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Field</th>
+                    <th>Description</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr><td><code>team_name</code></td><td>Must match your folder name</td></tr>
+                <tr><td><code>display_name</code></td><td>Shown on the leaderboard</td></tr>
+                <tr><td><code>agent_class</code></td><td>Java class name (must match filename)</td></tr>
+                <tr><td><code>agent_file</code></td><td>Java source file</td></tr>
+                <tr><td><code>model_provider</code></td><td><code>ollama</code>, <code>gemini</code>, <code>openai</code>, <code>deepseek</code>, or <code>none</code></td></tr>
+                <tr><td><code>model_name</code></td><td>Model identifier (e.g., <code>llama3.1:8b</code>)</td></tr>
+            </tbody>
+        </table>
+
+        <h2>Step 4: Implement Your Agent</h2>
+        <p>Your Java agent must:</p>
+        <ul>
+            <li>Use package <code>ai.abstraction.submissions.&lt;team_name&gt;</code> (hyphens become underscores)</li>
+            <li>Extend <code>AbstractionLayerAI</code></li>
+            <li>Have a constructor: <code>public YourAgent(UnitTypeTable utt)</code></li>
+            <li>Implement <code>getAction(int player, GameState gs)</code></li>
+            <li>Return <code>translateActions(player, gs)</code></li>
+        </ul>
+        <p>See <code>submissions/example-team/</code> for a working example.</p>
+
+        <h3>Available Actions</h3>
+        <ul>
+            <li><code>move(unit, x, y)</code> &mdash; Move unit to position</li>
+            <li><code>attack(unit, target)</code> &mdash; Attack an enemy unit</li>
+            <li><code>harvest(unit, resource, base)</code> &mdash; Gather resources</li>
+            <li><code>build(unit, type, x, y)</code> &mdash; Build a structure</li>
+            <li><code>train(unit, type)</code> &mdash; Train a unit from a building</li>
+            <li><code>idle(unit)</code> &mdash; Do nothing this tick</li>
+        </ul>
+
+        <h2>Step 5: Test Locally</h2>
+        <pre><code># Build the project
+ant build
+
+# Run a test game
+java -cp "lib/*:bin" rts.MicroRTS -f resources/config.properties
+
+# Validate your submission
+python3 tournament/validate_submission.py submissions/your-team-name/</code></pre>
+
+        <h2>Step 6: Submit a Pull Request</h2>
+        <p>Push your changes and open a PR against the <code>master</code> branch. Your PR should only contain files inside <code>submissions/your-team-name/</code>.</p>
+        <p>Maintainers will review your submission for security compliance and add it to the next tournament run.</p>
+
+        <h2>Security Restrictions</h2>
+        <p>The following APIs are forbidden:</p>
+        <ul>
+            <li><code>Runtime.exec</code> / <code>ProcessBuilder</code></li>
+            <li><code>ServerSocket</code> / raw sockets</li>
+            <li><code>System.exit</code></li>
+            <li>File deletion APIs</li>
+            <li>Dynamic class loading / reflection</li>
+            <li>Thread creation</li>
+        </ul>
+    </div>
+
+    <footer>
+        <div class="footer-content">
+            <p><a href="https://github.com/santiontanon/microrts">MicroRTS</a> &mdash; IEEE WCCI 2026 LLM Game AI Competition</p>
+        </div>
+    </footer>
+</body>
+</html>
