@@ -62,17 +62,42 @@
         </table>
 
         <h2>Step 4: Implement Your Agent</h2>
-        <p>Your Java agent must:</p>
+        <p>Two agent types are supported:</p>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Type</th>
+                    <th>Base Class</th>
+                    <th>Package</th>
+                    <th>Template</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Abstraction</td>
+                    <td><code>AbstractionLayerAI</code></td>
+                    <td><code>ai.abstraction.submissions.&lt;team&gt;</code></td>
+                    <td><code>_template/Agent.java</code></td>
+                </tr>
+                <tr>
+                    <td>MCTS</td>
+                    <td><code>NaiveMCTS</code> (or any <code>AI</code> subclass)</td>
+                    <td><code>ai.mcts.submissions.&lt;team&gt;</code></td>
+                    <td><code>_template/MCTSAgent.java</code></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <p>Your agent must:</p>
         <ul>
-            <li>Use package <code>ai.abstraction.submissions.&lt;team_name&gt;</code> (hyphens become underscores)</li>
-            <li>Extend <code>AbstractionLayerAI</code></li>
             <li>Have a constructor: <code>public YourAgent(UnitTypeTable utt)</code></li>
-            <li>Implement <code>getAction(int player, GameState gs)</code></li>
-            <li>Return <code>translateActions(player, gs)</code></li>
+            <li>Use one of the allowed packages above (hyphens become underscores in <code>&lt;team&gt;</code>)</li>
+            <li>Override <code>getAction(int player, GameState gs)</code></li>
         </ul>
         <p>See <code>submissions/example-team/</code> for a working example.</p>
 
-        <h3>Available Actions</h3>
+        <h3>Available Actions (AbstractionLayerAI agents)</h3>
         <ul>
             <li><code>move(unit, x, y)</code> &mdash; Move unit to position</li>
             <li><code>attack(unit, target)</code> &mdash; Attack an enemy unit</li>

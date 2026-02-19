@@ -27,6 +27,12 @@ REQUIRED_METADATA_FIELDS = [
 
 VALID_PROVIDERS = ["ollama", "gemini", "openai", "deepseek", "none"]
 
+# Allowed base packages for submissions
+ALLOWED_PACKAGES = [
+    "ai.abstraction.submissions",
+    "ai.mcts.submissions",
+]
+
 # Forbidden Java patterns (security)
 FORBIDDEN_PATTERNS = [
     (r'Runtime\s*\.\s*getRuntime\s*\(\s*\)\s*\.\s*exec', "Runtime.exec - spawning processes"),
@@ -109,13 +115,13 @@ def validate_submission(submission_dir):
 
     # Package declaration check
     package_name = team_name.replace("-", "_")
-    expected_package = f"ai.abstraction.submissions.{package_name}"
+    expected_packages = [f"{base}.{package_name}" for base in ALLOWED_PACKAGES]
     package_match = re.search(r'^\s*package\s+([\w.]+)\s*;', java_source, re.MULTILINE)
     if not package_match:
         errors.append("No package declaration found in Java file")
-    elif package_match.group(1) != expected_package:
+    elif package_match.group(1) not in expected_packages:
         errors.append(
-            f"Package must be '{expected_package}', "
+            f"Package must be one of {expected_packages}, "
             f"found '{package_match.group(1)}'"
         )
 

@@ -65,9 +65,6 @@ ANCHORS = {
     },
 }
 
-SUBMISSIONS_SRC_DIR = "src/ai/abstraction/submissions"
-
-
 def update_config(ai1, ai2):
     """Update config.properties with AI settings."""
     with open(CONFIG_FILE, 'r') as f:
@@ -187,7 +184,10 @@ def score_to_grade(score):
 def install_submission(submission_dir):
     """
     Copy a submission's Java file into the source tree.
-    Returns (fully_qualified_class, display_name) or (None, None) on failure.
+    Reads the package declaration from the Java source to determine
+    the correct install directory (supports ai.abstraction.submissions.*
+    and ai.mcts.submissions.*).
+    Returns (fully_qualified_class, display_name, metadata) or raises on failure.
     """
     submission_dir = Path(submission_dir)
     metadata_path = submission_dir / "metadata.json"
@@ -195,13 +195,20 @@ def install_submission(submission_dir):
     with open(metadata_path) as f:
         metadata = json.load(f)
 
-    team_name = metadata["team_name"]
     agent_class = metadata["agent_class"]
     agent_file = metadata["agent_file"]
-    package_name = team_name.replace("-", "_")
 
-    # Create package directory
-    target_dir = Path(SUBMISSIONS_SRC_DIR) / package_name
+    # Read package from Java source
+    java_source = (submission_dir / agent_file).read_text()
+    package_match = re.search(r'^\s*package\s+([\w.]+)\s*;', java_source, re.MULTILINE)
+    if not package_match:
+        raise ValueError(f"No package declaration in {agent_file}")
+
+    package = package_match.group(1)
+    package_path = package.replace(".", "/")
+
+    # Create package directory under src/
+    target_dir = Path("src") / package_path
     target_dir.mkdir(parents=True, exist_ok=True)
 
     # Copy Java file
@@ -209,8 +216,8 @@ def install_submission(submission_dir):
     dst = target_dir / agent_file
     shutil.copy2(src, dst)
 
-    fqcn = f"ai.abstraction.submissions.{package_name}.{agent_class}"
-    display_name = metadata.get("display_name", team_name)
+    fqcn = f"{package}.{agent_class}"
+    display_name = metadata.get("display_name", metadata["team_name"])
     return fqcn, display_name, metadata
 
 

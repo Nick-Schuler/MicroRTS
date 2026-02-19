@@ -4,7 +4,7 @@
 
 ### 1. Fork this repository
 
-Fork [MicroRTS](https://github.com/santiontanon/microrts) to your own GitHub account.
+Fork [MicroRTS](https://github.com/drchangliu/MicroRTS/) to your own GitHub account.
 
 ### 2. Create your team folder
 
@@ -42,12 +42,19 @@ Use a URL-safe team name (lowercase, hyphens, no spaces): `my-team`, `deepblue-a
 ### 4. Implement your agent
 
 Your Java agent must:
-- Be in package `ai.abstraction.submissions.<team_name>` (with hyphens replaced by underscores)
-- Extend `ai.abstraction.AbstractionLayerAI`
 - Have a constructor that takes `UnitTypeTable` as its only parameter
 - Not use forbidden APIs (see Security below)
 
-See `_template/Agent.java` for a minimal starting point and `example-team/` for a working example.
+**Two agent types are supported:**
+
+| Type | Base Class | Package | Template |
+|------|-----------|---------|----------|
+| Abstraction | `AbstractionLayerAI` | `ai.abstraction.submissions.<team_name>` | `_template/Agent.java` |
+| MCTS | `NaiveMCTS` (or any `AI` subclass) | `ai.mcts.submissions.<team_name>` | `_template/MCTSAgent.java` |
+
+Replace `<team_name>` with your folder name (hyphens replaced by underscores).
+
+See `_template/Agent.java` or `_template/MCTSAgent.java` for starting points, and `example-team/` for a working example.
 
 ### 5. Test locally
 
@@ -87,7 +94,8 @@ Submissions that attempt to circumvent these restrictions will be rejected.
 submissions/
   _template/           # Starting point for new agents
     metadata.json      # Team info schema
-    Agent.java         # Minimal agent template
+    Agent.java         # AbstractionLayerAI template
+    MCTSAgent.java     # NaiveMCTS template
   example-team/        # Working example submission
     metadata.json
     WorkerRushLLMAgent.java
