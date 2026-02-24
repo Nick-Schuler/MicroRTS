@@ -1,4 +1,4 @@
-package NickMCTS; 
+package ai.mcts.submissions.nick_mcts; 
 
 import ai.abstraction.WorkerRush;
 import ai.core.AI;
@@ -92,3 +92,4 @@ class MyEvaluation extends LanchesterEvaluationFunction {
         return threatPenalty;
     }
 }
+
