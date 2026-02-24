@@ -208,6 +208,11 @@ tbody tr:hover {
     font-size: 0.8rem;
 }
 
+.date-cell .time-ago {
+    color: var(--text-muted);
+    font-size: 0.75rem;
+}
+
 /* H2H matrix */
 #h2h-table th,
 #h2h-table td {

@@ -107,13 +107,23 @@ def load_tournament_entries():
 def build_leaderboard(entries):
     """
     Build the leaderboard: best score per unique display_name.
+    Also tracks the most recent evaluation date per entry (last_updated).
     Returns sorted list of entries (highest score first).
     """
     best = {}
+    latest_date = {}  # track most recent date per display_name
     for entry in entries:
         key = entry["display_name"]
         if key not in best or entry["score"] > best[key]["score"]:
             best[key] = entry
+        # Track the most recent date this entry was evaluated
+        entry_date = entry.get("date", "")
+        if key not in latest_date or entry_date > latest_date[key]:
+            latest_date[key] = entry_date
+
+    # Add last_updated to each leaderboard entry
+    for key, entry in best.items():
+        entry["last_updated"] = latest_date.get(key, entry.get("date", ""))
 
     return sorted(best.values(), key=lambda x: x["score"], reverse=True)
 

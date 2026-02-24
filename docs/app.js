@@ -72,6 +72,40 @@
         }
     }
 
+    // Relative time (e.g., "3 days ago")
+    function timeAgo(dateStr) {
+        if (!dateStr) return '';
+        try {
+            var d = new Date(dateStr);
+            var now = new Date();
+            var diffMs = now - d;
+            var diffMins = Math.floor(diffMs / 60000);
+            var diffHours = Math.floor(diffMs / 3600000);
+            var diffDays = Math.floor(diffMs / 86400000);
+
+            if (diffMins < 1) return 'just now';
+            if (diffMins < 60) return diffMins + 'm ago';
+            if (diffHours < 24) return diffHours + 'h ago';
+            if (diffDays === 1) return '1 day ago';
+            if (diffDays < 30) return diffDays + ' days ago';
+            if (diffDays < 365) return Math.floor(diffDays / 30) + ' months ago';
+            return Math.floor(diffDays / 365) + ' years ago';
+        } catch (e) {
+            return '';
+        }
+    }
+
+    // Format date with relative time for leaderboard
+    function formatDateWithAge(dateStr) {
+        if (!dateStr) return '--';
+        var formatted = formatDate(dateStr);
+        var relative = timeAgo(dateStr);
+        if (relative) {
+            return formatted + '<br><small class="time-ago">' + relative + '</small>';
+        }
+        return formatted;
+    }
+
     // Render leaderboard
     function renderLeaderboard(data) {
         var tbody = document.querySelector('#leaderboard-table tbody');
@@ -86,7 +120,7 @@
             html += '<td>' + escapeHtml(entry.display_name) + '</td>';
             html += '<td class="score-cell">' + entry.score + '</td>';
             html += '<td>' + gradeBadge(entry.grade) + '</td>';
-            html += '<td class="date-cell">' + formatDate(entry.date) + '</td>';
+            html += '<td class="date-cell">' + formatDateWithAge(entry.last_updated || entry.date) + '</td>';
 
             ANCHORS.forEach(function (anchor) {
                 html += opponentCell(entry.opponents, anchor);

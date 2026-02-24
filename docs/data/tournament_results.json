@@ -1,5 +1,5 @@
 {
-  "generated": "2026-02-24T20:05:48.844010",
+  "generated": "2026-02-24T21:41:12.734617",
   "anchors": [
     "RandomBiasedAI",
     "HeavyRush",
@@ -77,7 +77,8 @@
           "avg_game_score": 1.2,
           "weighted_points": 24.0
         }
-      }
+      },
+      "last_updated": "2026-02-04T18:08:17.927884"
     },
     {
       "source": "benchmark",
@@ -135,7 +136,8 @@
           "avg_game_score": 0.0,
           "weighted_points": 0.0
         }
-      }
+      },
+      "last_updated": "2026-02-05T09:04:51.214984"
     },
     {
       "source": "benchmark",
@@ -186,7 +188,8 @@
           "avg_game_score": 0.0,
           "weighted_points": 0.0
         }
-      }
+      },
+      "last_updated": "2026-02-04T17:16:58.434397"
     },
     {
       "source": "benchmark",
@@ -237,7 +240,8 @@
           "avg_game_score": 0.0,
           "weighted_points": 0.0
         }
-      }
+      },
+      "last_updated": "2026-02-04T18:08:17.927884"
     },
     {
       "source": "benchmark",
@@ -288,7 +292,8 @@
           "avg_game_score": 0.0,
           "weighted_points": 0.0
         }
-      }
+      },
+      "last_updated": "2026-02-05T04:56:29.979214"
     },
     {
       "source": "benchmark",
@@ -332,7 +337,8 @@
           "avg_game_score": 0.0,
           "weighted_points": 0.0
         }
-      }
+      },
+      "last_updated": "2026-02-04T17:16:58.434397"
     },
     {
       "source": "benchmark",
@@ -376,7 +382,8 @@
           "avg_game_score": 0.0,
           "weighted_points": 0.0
         }
-      }
+      },
+      "last_updated": "2026-02-05T04:53:52.671550"
     },
     {
       "source": "benchmark",
@@ -420,7 +427,8 @@
           "avg_game_score": 0.0,
           "weighted_points": 0.0
         }
-      }
+      },
+      "last_updated": "2026-02-05T04:53:52.671550"
     },
     {
       "source": "benchmark",
@@ -464,7 +472,8 @@
           "avg_game_score": 0.0,
           "weighted_points": 0.0
         }
-      }
+      },
+      "last_updated": "2026-02-05T04:56:29.979214"
     },
     {
       "source": "benchmark",
@@ -508,7 +517,8 @@
           "avg_game_score": 0.0,
           "weighted_points": 0.0
         }
-      }
+      },
+      "last_updated": "2026-02-05T04:58:17.079253"
     },
     {
       "source": "benchmark",
@@ -552,7 +562,8 @@
           "avg_game_score": 0.0,
           "weighted_points": 0.0
         }
-      }
+      },
+      "last_updated": "2026-02-05T09:04:51.214984"
     },
     {
       "source": "tournament",
@@ -597,7 +608,8 @@
           "avg_game_score": 0.0,
           "weighted_points": 0.0
         }
-      }
+      },
+      "last_updated": "2026-02-24T21:40:09.990203"
     },
     {
       "source": "tournament",
@@ -642,7 +654,8 @@
           "avg_game_score": 0.0,
           "weighted_points": 0.0
         }
-      }
+      },
+      "last_updated": "2026-02-24T21:40:09.990203"
     },
     {
       "source": "benchmark",
@@ -668,7 +681,8 @@
           "draws": 1,
           "losses": 0
         }
-      }
+      },
+      "last_updated": "2026-02-03T05:48:36.310330"
     },
     {
       "source": "benchmark",
@@ -705,7 +719,47 @@
           "avg_game_score": 0.0,
           "weighted_points": 0.0
         }
-      }
+      },
+      "last_updated": "2026-02-05T04:58:17.079253"
+    },
+    {
+      "source": "tournament",
+      "source_file": "tournament_2026-02-24_21-40.json",
+      "team_name": "jmurr",
+      "display_name": "jmurr",
+      "model_provider": "none",
+      "model_name": "none",
+      "agent_type": "submission",
+      "score": 35.0,
+      "grade": "F",
+      "eliminated_at": "LightRush",
+      "date": "2026-02-24T21:40:09.990203",
+      "map": "maps/8x8/basesWorkers8x8.xml",
+      "games_per_matchup": 1,
+      "opponents": {
+        "RandomBiasedAI": {
+          "wins": 1,
+          "draws": 0,
+          "losses": 0,
+          "avg_game_score": 1.1,
+          "weighted_points": 11.0
+        },
+        "HeavyRush": {
+          "wins": 1,
+          "draws": 0,
+          "losses": 0,
+          "avg_game_score": 1.2,
+          "weighted_points": 24.0
+        },
+        "LightRush": {
+          "wins": 0,
+          "draws": 0,
+          "losses": 1,
+          "avg_game_score": 0.0,
+          "weighted_points": 0.0
+        }
+      },
+      "last_updated": "2026-02-24T21:40:09.990203"
     },
     {
       "source": "benchmark",
@@ -728,7 +782,8 @@
           "avg_game_score": 0.5,
           "weighted_points": 5.0
         }
-      }
+      },
+      "last_updated": "2026-02-04T17:16:58.434397"
     },
     {
       "source": "tournament",
@@ -752,7 +807,33 @@
           "avg_game_score": 0.5,
           "weighted_points": 5.0
         }
-      }
+      },
+      "last_updated": "2026-02-24T21:40:09.990203"
+    },
+    {
+      "source": "tournament",
+      "source_file": "tournament_2026-02-24_21-40.json",
+      "team_name": "xiebot",
+      "display_name": "xiebot",
+      "model_provider": "none",
+      "model_name": "none",
+      "agent_type": "submission",
+      "score": 5.0,
+      "grade": "F",
+      "eliminated_at": "RandomBiasedAI",
+      "date": "2026-02-24T21:40:09.990203",
+      "map": "maps/8x8/basesWorkers8x8.xml",
+      "games_per_matchup": 1,
+      "opponents": {
+        "RandomBiasedAI": {
+          "wins": 0,
+          "draws": 1,
+          "losses": 0,
+          "avg_game_score": 0.5,
+          "weighted_points": 5.0
+        }
+      },
+      "last_updated": "2026-02-24T21:40:09.990203"
     },
     {
       "source": "benchmark",
@@ -778,7 +859,8 @@
           "draws": 0,
           "losses": 1
         }
-      }
+      },
+      "last_updated": "2026-02-03T05:48:36.310330"
     },
     {
       "source": "benchmark",
@@ -804,7 +886,8 @@
           "draws": 0,
           "losses": 1
         }
-      }
+      },
+      "last_updated": "2026-02-03T05:48:36.310330"
     },
     {
       "source": "benchmark",
@@ -827,7 +910,8 @@
           "avg_game_score": 0.0,
           "weighted_points": 0.0
         }
-      }
+      },
+      "last_updated": "2026-02-04T17:16:58.434397"
     },
     {
       "source": "benchmark",
@@ -850,34 +934,51 @@
           "avg_game_score": 0.0,
           "weighted_points": 0.0
         }
-      }
-    },
-    {
-      "source": "tournament",
-      "source_file": "tournament_2026-02-24_20-05.json",
-      "team_name": "jmurr",
-      "display_name": "jmurr",
-      "model_provider": "none",
-      "model_name": "none",
-      "agent_type": "submission",
-      "score": 0.0,
-      "grade": "F",
-      "eliminated_at": "RandomBiasedAI",
-      "date": "2026-02-24T20:05:06.574844",
-      "map": "maps/8x8/basesWorkers8x8.xml",
-      "games_per_matchup": 1,
-      "opponents": {
-        "RandomBiasedAI": {
-          "wins": 0,
-          "draws": 0,
-          "losses": 1,
-          "avg_game_score": 0.0,
-          "weighted_points": 0.0
-        }
-      }
+      },
+      "last_updated": "2026-02-04T17:16:58.434397"
     }
   ],
   "history": [
+    {
+      "display_name": "AlliBot",
+      "score": 54.0,
+      "grade": "D",
+      "date": "2026-02-24T21:40:09.990203",
+      "source": "tournament",
+      "map": "maps/8x8/basesWorkers8x8.xml"
+    },
+    {
+      "display_name": "Example Team",
+      "score": 54.0,
+      "grade": "D",
+      "date": "2026-02-24T21:40:09.990203",
+      "source": "tournament",
+      "map": "maps/8x8/basesWorkers8x8.xml"
+    },
+    {
+      "display_name": "jmurr",
+      "score": 35.0,
+      "grade": "F",
+      "date": "2026-02-24T21:40:09.990203",
+      "source": "tournament",
+      "map": "maps/8x8/basesWorkers8x8.xml"
+    },
+    {
+      "display_name": "Nick MCTS",
+      "score": 5.0,
+      "grade": "F",
+      "date": "2026-02-24T21:40:09.990203",
+      "source": "tournament",
+      "map": "maps/8x8/basesWorkers8x8.xml"
+    },
+    {
+      "display_name": "xiebot",
+      "score": 5.0,
+      "grade": "F",
+      "date": "2026-02-24T21:40:09.990203",
+      "source": "tournament",
+      "map": "maps/8x8/basesWorkers8x8.xml"
+    },
     {
       "display_name": "AlliBot",
       "score": 54.0,
@@ -1075,49 +1176,64 @@
     "AlliBot": {
       "Example Team": {
         "wins": 0,
-        "losses": 2,
+        "losses": 3,
         "draws": 0
       },
       "jmurr": {
-        "wins": 1,
-        "losses": 0,
-        "draws": 0
-      },
-      "Nick MCTS": {
-        "wins": 0,
-        "losses": 0,
-        "draws": 1
-      }
-    },
-    "Example Team": {
-      "AlliBot": {
         "wins": 2,
         "losses": 0,
         "draws": 0
       },
-      "jmurr": {
+      "Nick MCTS": {
+        "wins": 0,
+        "losses": 0,
+        "draws": 2
+      },
+      "xiebot": {
         "wins": 1,
+        "losses": 0,
+        "draws": 0
+      }
+    },
+    "Example Team": {
+      "AlliBot": {
+        "wins": 3,
+        "losses": 0,
+        "draws": 0
+      },
+      "jmurr": {
+        "wins": 2,
         "losses": 0,
         "draws": 0
       },
       "Nick MCTS": {
         "wins": 0,
         "losses": 0,
-        "draws": 1
+        "draws": 2
+      },
+      "xiebot": {
+        "wins": 1,
+        "losses": 0,
+        "draws": 0
       }
     },
     "jmurr": {
       "AlliBot": {
         "wins": 0,
-        "losses": 1,
+        "losses": 2,
         "draws": 0
       },
       "Example Team": {
         "wins": 0,
-        "losses": 1,
+        "losses": 2,
         "draws": 0
       },
       "Nick MCTS": {
+        "wins": 0,
+        "losses": 0,
+        "draws": 2
+      },
+      "xiebot": {
         "wins": 0,
         "losses": 0,
         "draws": 1
@@ -1127,14 +1243,41 @@
       "AlliBot": {
         "wins": 0,
         "losses": 0,
-        "draws": 1
+        "draws": 2
       },
       "Example Team": {
         "wins": 0,
         "losses": 0,
-        "draws": 1
+        "draws": 2
       },
       "jmurr": {
+        "wins": 0,
+        "losses": 0,
+        "draws": 2
+      },
+      "xiebot": {
+        "wins": 0,
+        "losses": 0,
+        "draws": 1
+      }
+    },
+    "xiebot": {
+      "AlliBot": {
+        "wins": 0,
+        "losses": 1,
+        "draws": 0
+      },
+      "Example Team": {
+        "wins": 0,
+        "losses": 1,
+        "draws": 0
+      },
+      "jmurr": {
+        "wins": 0,
+        "losses": 0,
+        "draws": 1
+      },
+      "Nick MCTS": {
         "wins": 0,
         "losses": 0,
         "draws": 1
