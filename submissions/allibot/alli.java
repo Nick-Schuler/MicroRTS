@@ -9,11 +9,16 @@
  *    immediately fall back to original rule-based behavior in this file.
  *
  * General Flow:
- * 1) Game calls getAction() at ~1456.
- * 2) Try Search+LLM first via trySearchLLMAction() at ~1385.
+ * 1) Game calls getAction() at ~1424.
+ * 2) Try Search+LLM first via trySearchLLMAction() at ~1353.
  * 3) If Search+LLM returns a real action, use it immediately.
- * 4) If search is disabled, skipped, fails, or returns no real move, fallback to getRuleBasedAction() at ~1412.
+ * 4) If search is disabled, skipped, fails, or returns no real move, fallback to getRuleBasedAction() at ~1380.
  * 5) Fallback runs the original pre-LLM rule-based logic.
+ *
+ * Recent updates:
+ * 1) Removed reflection-based System.getenv() mutation for OLLAMA_* defaults.
+ *    OLLAMA_HOST and OLLAMA_MODEL must be provided by environment/config.
+ * 2) Added null guard in reset() (~246) before calling _searchAgent.reset().
  */
 
 package ai.abstraction.submissions.allibot;
@@ -30,8 +35,6 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
-import java.lang.reflect.Field;
 import rts.GameState;
 import rts.PhysicalGameState;
 import static rts.PhysicalGameState.TERRAIN_WALL;
@@ -52,30 +55,6 @@ import rts.units.UnitTypeTable;
  * version 2.0
 */
 public class alli extends AIWithComputationBudget {
-    private static final String DEFAULT_OLLAMA_MODEL = "qwen3:14b";
-    private static final String DEFAULT_OLLAMA_HOST = "http://localhost:11434";
-
-    static {
-        // Ensure defaults so no shell exports are required for qwen3:14b on localhost.
-        ensureEnv("OLLAMA_MODEL", DEFAULT_OLLAMA_MODEL);
-        ensureEnv("OLLAMA_HOST", DEFAULT_OLLAMA_HOST);
-    }
-
-    @SuppressWarnings({"unchecked", "rawtypes"})
-    private static void ensureEnv(String key, String value) {
-        try {
-            Map<String, String> env = System.getenv();
-            if (env.containsKey(key)) return;
-
-            Field m = env.getClass().getDeclaredField("m");
-            m.setAccessible(true);
-            Map<String, String> mutable = (Map<String, String>) m.get(env);
-            mutable.putIfAbsent(key, value);
-        } catch (Exception ignored) {
-            // If we cannot mutate, continue without throwing; downstream code will use existing env.
-        }
-    }
-        
     public class Pos {
         int _x;
         int _y;
@@ -268,7 +247,8 @@ public class alli extends AIWithComputationBudget {
         _memHarvesters = new ArrayList<>();
         _lastSearchTick = -9999;
         // Reset internal tree/cache state in the Search+LLM delegate.
-        _searchAgent.reset();
+        if (_searchAgent != null)
+            _searchAgent.reset();
         restartPathFind(); //FloodFillPathFinding();//BFSPathFinding();//AStarPathFinding();
     }
     @Override
