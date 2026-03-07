@@ -1,5 +1,5 @@
 {
-  "generated": "2026-03-06T15:38:52.251337",
+  "generated": "2026-03-07T01:58:48.370083",
   "anchors": [
     "RandomBiasedAI",
     "HeavyRush",
@@ -874,6 +874,53 @@
       "last_updated": "2026-03-05T14:27:52.457011"
     },
     {
+      "source": "tournament",
+      "source_file": "tournament_2026-03-07_01-58.json",
+      "team_name": "mayari-llm",
+      "display_name": "Mayari-LLM",
+      "agent_class": "ai.abstraction.submissions.mayari_llm.mayari",
+      "model_provider": "ollama",
+      "model_name": "llama3.1:8b",
+      "agent_type": "submission",
+      "score": 54.0,
+      "grade": "D",
+      "eliminated_at": "WorkerRush",
+      "date": "2026-03-07T01:58:34.330934",
+      "map": "maps/8x8/basesWorkers8x8.xml",
+      "games_per_matchup": 1,
+      "opponents": {
+        "RandomBiasedAI": {
+          "wins": 1,
+          "draws": 0,
+          "losses": 0,
+          "avg_game_score": 1.2,
+          "weighted_points": 12.0
+        },
+        "HeavyRush": {
+          "wins": 1,
+          "draws": 0,
+          "losses": 0,
+          "avg_game_score": 1.2,
+          "weighted_points": 24.0
+        },
+        "LightRush": {
+          "wins": 1,
+          "draws": 0,
+          "losses": 0,
+          "avg_game_score": 1.2,
+          "weighted_points": 18.0
+        },
+        "WorkerRush": {
+          "wins": 0,
+          "draws": 0,
+          "losses": 1,
+          "avg_game_score": 0.0,
+          "weighted_points": 0.0
+        }
+      },
+      "last_updated": "2026-03-07T01:58:34.330934"
+    },
+    {
       "source": "benchmark",
       "team_name": null,
       "display_name": "gemini-2.5-flash",
@@ -1246,6 +1293,45 @@
     }
   ],
   "history": [
+    {
+      "display_name": "Mayari-LLM",
+      "score": 54.0,
+      "grade": "D",
+      "date": "2026-03-07T01:58:34.330934",
+      "source": "tournament",
+      "map": "maps/8x8/basesWorkers8x8.xml",
+      "agent_class": "ai.abstraction.submissions.mayari_llm.mayari",
+      "opponents": {
+        "RandomBiasedAI": {
+          "wins": 1,
+          "draws": 0,
+          "losses": 0,
+          "avg_game_score": 1.2,
+          "weighted_points": 12.0
+        },
+        "HeavyRush": {
+          "wins": 1,
+          "draws": 0,
+          "losses": 0,
+          "avg_game_score": 1.2,
+          "weighted_points": 24.0
+        },
+        "LightRush": {
+          "wins": 1,
+          "draws": 0,
+          "losses": 0,
+          "avg_game_score": 1.2,
+          "weighted_points": 18.0
+        },
+        "WorkerRush": {
+          "wins": 0,
+          "draws": 0,
+          "losses": 1,
+          "avg_game_score": 0.0,
+          "weighted_points": 0.0
+        }
+      }
+    },
     {
       "display_name": "PenguinBot v2 (Search+LLM)",
       "score": 22.0,
