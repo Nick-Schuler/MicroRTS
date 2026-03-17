@@ -23,16 +23,15 @@ import rts.units.UnitTypeTable;
 import rts.units.Unit;
 import rts.PhysicalGameState;
 
-/**
- * NickMCTS: An adaptive NaiveMCTS agent using environment-configurable LLM strategy.
- */
 public class NickMCTS extends NaiveMCTS {
     private UnitTypeTable utt;
     private final StrategyController controller = new StrategyController();
     private int lastUpdateFrame = -1;
 
     public NickMCTS(UnitTypeTable utt) {
-        super(100, -1, 100, 10, 0.3f, 0.0f, 0.4f,
+        // TUNE MCTS PARAMETERS HERE:
+        // Changed time_budget to 150, max_depth to 15, and epsilon_l to 0.15f for better exploitation
+        super(150, -1, 100, 15, 0.15f, 0.0f, 0.4f,
               new WorkerRush(utt), 
               new MyEvaluation(utt, null), 
               true);
@@ -61,13 +60,14 @@ public class NickMCTS extends NaiveMCTS {
 }
 
 class StrategyController {
-    // Standard environment variables for tournament configuration
     private static final String OLLAMA_HOST = System.getenv().getOrDefault("OLLAMA_HOST", "http://localhost:11434");
     private static final String OLLAMA_MODEL = System.getenv().getOrDefault("OLLAMA_MODEL", "llama3.1:8b");
     
     public volatile float aggression = 1.0f;
     public volatile float threatWeight = 1.0f;
     public volatile float resourceWeight = 0.2f;
+    // New: Offensive weight to pull MCTS toward enemy base
+    public volatile float offensiveWeight = 0.2f; 
 
     private final HttpClient client = HttpClient.newBuilder()
             .connectTimeout(Duration.ofMillis(500))
@@ -76,10 +76,10 @@ class StrategyController {
 
     public void updateStrategy(GameState gs, int player) {
         String stateSummary = summarizeState(gs, player);
+        // Prompt updated to ask for offensive weight ('off')
         String prompt = "MicroRTS state: " + stateSummary + 
-                        ". Respond ONLY JSON: {\"agg\":float(0.5-2), \"thr\":float(0-5), \"res\":float(0-1)}";
+                        ". Respond ONLY JSON: {\"agg\":float(0.5-2), \"thr\":float(0-5), \"res\":float(0-1), \"off\":float(0-1)}";
 
-        // Build JSON safely using a Map and Gson to prevent injection
         Map<String, Object> payload = new HashMap<>();
         payload.put("model", OLLAMA_MODEL);
         payload.put("prompt", prompt);
@@ -124,7 +124,6 @@ class StrategyController {
 
     private void parseAndApply(String responseBody) {
         try {
-            // Ollama returns a wrapper JSON; the actual model output is in the "response" field
             JsonObject topObj = JsonParser.parseString(responseBody).getAsJsonObject();
             String modelOutput = topObj.get("response").getAsString();
             JsonObject strategy = JsonParser.parseString(modelOutput).getAsJsonObject();
@@ -132,6 +131,7 @@ class StrategyController {
             if (strategy.has("agg")) this.aggression = strategy.get("agg").getAsFloat();
             if (strategy.has("thr")) this.threatWeight = strategy.get("thr").getAsFloat();
             if (strategy.has("res")) this.resourceWeight = strategy.get("res").getAsFloat();
+            if (strategy.has("off")) this.offensiveWeight = strategy.get("off").getAsFloat();
         } catch (Exception e) { /* Keep current weights */ }
     }
 }
@@ -150,9 +150,16 @@ class MyEvaluation extends LanchesterEvaluationFunction {
         float agg = (sc != null) ? sc.aggression : 1.0f;
         float thr = (sc != null) ? sc.threatWeight : 1.0f;
         float res = (sc != null) ? sc.resourceWeight : 0.2f;
+        float off = (sc != null) ? sc.offensiveWeight : 0.2f;
 
+        // Base evaluation multiplied by aggression
         float score = super.evaluate(maxplayer, minplayer, gs) * agg;
-        float threatPenalty = calculateThreat(maxplayer, gs) * thr;
+        
+        // REDUCED THREAT PENALTY: Changed multiplier from 0.1f to 0.05f to be less defensive
+        float threatPenalty = calculateThreat(maxplayer, gs, 0.05f) * thr;
+        
+        // NEW OFFENSIVE BONUS: Incentivize units to move toward enemy bases
+        float offensiveBonus = calculateOffensiveBonus(maxplayer, gs) * off;
         
         float carryingBonus = 0;
         for (Unit u : gs.getUnits()) {
@@ -160,10 +167,10 @@ class MyEvaluation extends LanchesterEvaluationFunction {
                 carryingBonus += res;
             }
         }
-        return score - threatPenalty + carryingBonus;
+        return score - threatPenalty + carryingBonus + offensiveBonus;
     }
 
-    private float calculateThreat(int player, GameState gs) {
+    private float calculateThreat(int player, GameState gs, float weight) {
         float threatPenalty = 0.0f;
         PhysicalGameState pgs = gs.getPhysicalGameState();
         for (Unit u : pgs.getUnits()) {
@@ -171,11 +178,35 @@ class MyEvaluation extends LanchesterEvaluationFunction {
                 for (Unit e : pgs.getUnits()) {
                     if (e.getPlayer() == 1 - player) {
                         int dist = Math.abs(u.getX() - e.getX()) + Math.abs(u.getY() - e.getY());
-                        if (dist < 8) threatPenalty += (8 - dist) * 0.1f;
+                        if (dist < 8) threatPenalty += (8 - dist) * weight;
                     }
                 }
             }
         }
         return threatPenalty;
+    }
+
+    private float calculateOffensiveBonus(int player, GameState gs) {
+        float bonus = 0;
+        PhysicalGameState pgs = gs.getPhysicalGameState();
+        Unit enemyBase = null;
+
+        // Find the first enemy base to target
+        for (Unit u : pgs.getUnits()) {
+            if (u.getPlayer() == 1 - player && u.getType().name.equals("Base")) {
+                enemyBase = u;
+                break;
+            }
+        }
+
+        if (enemyBase != null) {
+            for (Unit u : pgs.getUnits()) {
+                if (u.getPlayer() == player && !u.getType().canHarvest) { // Combat units only
+                    int dist = Math.abs(u.getX() - enemyBase.getX()) + Math.abs(u.getY() - enemyBase.getY());
+                    if (dist < 12) bonus += (12 - dist) * 0.1f;
+                }
+            }
+        }
+        return bonus;
     }
 }
