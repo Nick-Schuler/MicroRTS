@@ -1,8 +1,9 @@
 package ai.mcts.submissions.nick_mcts;
 
-import ai.mayari.Mayari; 
+import ai.abstraction.LightRush;
 import ai.core.AI;
 import ai.core.ParameterSpecification;
+import ai.RandomBiasedAI;
 import ai.evaluation.LanchesterEvaluationFunction;
 import ai.mcts.naivemcts.NaiveMCTS;
 import java.util.ArrayList;
@@ -29,52 +30,72 @@ public class NickMCTS extends NaiveMCTS {
     private int lastUpdateFrame = -1;
 
     public NickMCTS(UnitTypeTable utt) {
-        /* - Time Budget: 160ms
-           - Max Iterations: -1 (Use full time)
-           - Max Depth: 50
-           - Playout Policy: Mayari (CRITICAL: Fixes the WorkerRush/Harvest NullPointerException)
-        */
-        super(160, -1, 100, 50, 0.02f, 0.0f, 0.4f,
-              new Mayari(utt), 
+        // Initialize super with the Safe wrapper to catch library bugs during MCTS simulations
+        super(160, -1, 100, 25, 0.02f, 0.0f, 0.4f,
+              new SafeLightRush(utt), 
               new MyEvaluation(utt, null), 
               true);
+        
         this.utt = utt;
-        // Connect the LLM strategy controller to the evaluation function
-        ((MyEvaluation)this.ef).setController(this.controller);
+        
+        // Link the controller to the evaluation function
+        if (this.ef instanceof MyEvaluation) {
+            ((MyEvaluation)this.ef).setController(this.controller);
+        }
     }
 
     @Override
     public PlayerAction getAction(int player, GameState gs) throws Exception {
-        long startTime = System.currentTimeMillis();
-
-        // Update strategy via LLM every 200 frames
+        // Strategic update every 200 frames via LLM
         if (gs != null && gs.getTime() % 200 == 0 && gs.getTime() != lastUpdateFrame) {
             lastUpdateFrame = gs.getTime();
             controller.updateStrategy(gs, player);
         }
-
-        // Call the MCTS logic
-        PlayerAction pa = super.getAction(player, gs);
-
-        // Debug Performance Logging (Watch your terminal for these!)
-        long duration = System.currentTimeMillis() - startTime;
-        if (gs != null && gs.getTime() % 20 == 0) {
-            System.out.println(String.format("[NickMCTS] Frame: %d | Sims: %d | Time: %dms | Agg: %.2f", 
-                               gs.getTime(), this.m_iter, duration, controller.aggression));
-        }
-
-        return pa;
+        return super.getAction(player, gs);
     }
 
     @Override
     public AI clone() {
-        // Essential: MCTS requires a clean clone that uses the same UTT
         return new NickMCTS(this.utt);
     }
 
     @Override
     public List<ParameterSpecification> getParameters() {
         return new ArrayList<>();
+    }
+}
+
+/**
+ * Safe Wrapper for LightRush.
+ * Catches NullPointerExceptions in the underlying Harvest abstraction.
+ */
+class SafeLightRush extends LightRush {
+    private AI fallback;
+
+    public SafeLightRush(UnitTypeTable utt) {
+        super(utt);
+        // RandomBiasedAI is robust and doesn't use the buggy abstraction layer
+        this.fallback = new RandomBiasedAI();
+    }
+
+    @Override
+    public PlayerAction getAction(int player, GameState gs) {
+        try {
+            return super.getAction(player, gs);
+        } catch (Exception e) {
+            // If Harvest crashes (target null), fallback to RandomBiasedAI 
+            // so the MCTS simulation can actually progress.
+            try {
+                return fallback.getAction(player, gs);
+            } catch (Exception e2) {
+                return new PlayerAction(); 
+            }
+        }
+    }
+
+    @Override
+    public AI clone() {
+        return new SafeLightRush(this.utt);
     }
 }
 
@@ -96,8 +117,8 @@ class StrategyController {
         if (gs == null) return;
         
         String stateSummary = summarizeState(gs, player);
-        String prompt = "MicroRTS Battle Context: " + stateSummary + 
-                        ". Task: Break the draw. Respond ONLY JSON: " +
+        String prompt = "MicroRTS Context: " + stateSummary + 
+                        ". Task: Break draw. Respond JSON ONLY: " +
                         "{\"agg\":float(0.5-3), \"thr\":float(0-5), \"res\":float(0-1), \"off\":float(0-2)}";
 
         Map<String, Object> payload = new HashMap<>();
@@ -106,12 +127,10 @@ class StrategyController {
         payload.put("stream", false);
         payload.put("format", "json");
         
-        String jsonBody = gson.toJson(payload);
-
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(OLLAMA_HOST + "/api/generate"))
                 .header("Content-Type", "application/json")
-                .POST(HttpRequest.BodyPublishers.ofString(jsonBody))
+                .POST(HttpRequest.BodyPublishers.ofString(gson.toJson(payload)))
                 .build();
 
         client.sendAsync(request, HttpResponse.BodyHandlers.ofString())
@@ -123,9 +142,9 @@ class StrategyController {
     private String summarizeState(GameState gs, int player) {
         int[] my = countUnits(gs, player);
         int[] en = countUnits(gs, 1 - player);
-        return String.format("Me[Units:%d,Base:%d,Barracks:%d,Gold:%d] En[Units:%d,Base:%d,Barracks:%d,Gold:%d]",
-            (my[0]+my[1]), my[2], my[3], gs.getPlayer(player).getResources(),
-            (en[0]+en[1]), en[2], en[3], gs.getPlayer(1-player).getResources());
+        return String.format("Me[U:%d,B:%d,R:%d] En[U:%d,B:%d,R:%d]",
+            (my[0]+my[1]), my[2], gs.getPlayer(player).getResources(),
+            (en[0]+en[1]), en[2], gs.getPlayer(1-player).getResources());
     }
 
     private int[] countUnits(GameState gs, int p) {
@@ -145,17 +164,14 @@ class StrategyController {
     private void parseAndApply(String responseBody) {
         try {
             JsonObject topObj = JsonParser.parseString(responseBody).getAsJsonObject();
-            if (!topObj.has("response")) return;
-            
             String modelOutput = topObj.get("response").getAsString();
-            modelOutput = modelOutput.replaceAll("```json|```", "").trim();
             JsonObject strategy = JsonParser.parseString(modelOutput).getAsJsonObject();
 
             if (strategy.has("agg")) this.aggression = strategy.get("agg").getAsFloat();
             if (strategy.has("thr")) this.threatWeight = strategy.get("thr").getAsFloat();
             if (strategy.has("res")) this.resourceWeight = strategy.get("res").getAsFloat();
             if (strategy.has("off")) this.offensiveWeight = strategy.get("off").getAsFloat();
-        } catch (Exception e) { /* Persistence on failure */ }
+        } catch (Exception e) { }
     }
 }
 
@@ -196,10 +212,8 @@ class MyEvaluation extends LanchesterEvaluationFunction {
     private float calculateThreat(int player, GameState gs, float weight) {
         float threatPenalty = 0.0f;
         PhysicalGameState pgs = gs.getPhysicalGameState();
-        if (pgs == null) return 0;
-
         for (Unit u : pgs.getUnits()) {
-            if (u != null && u.getPlayer() == player && u.getType() != null && u.getType().name.equals("Base")) {
+            if (u != null && u.getPlayer() == player && u.getType().name.equals("Base")) {
                 for (Unit e : pgs.getUnits()) {
                     if (e != null && e.getPlayer() == 1 - player) {
                         int dist = Math.abs(u.getX() - e.getX()) + Math.abs(u.getY() - e.getY());
@@ -212,25 +226,21 @@ class MyEvaluation extends LanchesterEvaluationFunction {
     }
 
     private float calculateGlobalOffensiveBonus(int player, GameState gs) {
-        float bonus = 0;
         PhysicalGameState pgs = gs.getPhysicalGameState();
-        if (pgs == null) return 0;
-        
         int mapDim = pgs.getWidth() + pgs.getHeight();
         Unit enemyTarget = null;
 
         for (Unit u : pgs.getUnits()) {
-            if (u != null && u.getPlayer() == 1 - player && u.getType() != null) {
-                if (enemyTarget == null || u.getType().name.equals("Base")) {
-                    enemyTarget = u;
-                }
+            if (u != null && u.getPlayer() == 1 - player) {
+                if (enemyTarget == null || u.getType().name.equals("Base")) enemyTarget = u;
             }
         }
 
         if (enemyTarget == null) return 0;
 
+        float bonus = 0;
         for (Unit u : pgs.getUnits()) {
-            if (u != null && u.getPlayer() == player && u.getType() != null && u.getType().canAttack) {
+            if (u != null && u.getPlayer() == player && u.getType().canAttack) {
                 int dist = Math.abs(u.getX() - enemyTarget.getX()) + Math.abs(u.getY() - enemyTarget.getY());
                 bonus += (mapDim - dist) * 0.15f; 
             }
@@ -238,3 +248,4 @@ class MyEvaluation extends LanchesterEvaluationFunction {
         return bonus;
     }
 }
+
